@@ -1,5 +1,5 @@
-%define their_version 2.6.STABLE12
-%define version 2.6.STABLE12
+%define their_version 2.6.STABLE13
+%define version 2.6.STABLE13
 
 ## Redefine configure values.
 %define         _bindir %{_prefix}/sbin
@@ -40,7 +40,7 @@ Patch8: 	squid-2.6.STABLE1-visible_hostname.diff
 Patch9: 	squid-2.6.STABLE-smb-auth.diff
 # http://devel.squid-cache.org/projects.html#icap
 # http://devel.squid-cache.org/cgi-bin/diff2/icap-2.6.patch
-Patch300:	squid-2.6.STABLE12-icap.diff
+Patch300:	squid-2.6.STABLE13-icap.diff
 Patch301:	squid-2.6.STABLE1-getconf_mess.diff
 Patch400:	squid-2.6.STABLE12-fixcompile.diff
 Patch401:	squid-2.6.STABLE12-fd_note_static.diff
