@@ -1,5 +1,5 @@
-%define their_version 2.6.STABLE7
-%define version 2.6.STABLE7
+%define their_version 2.6.STABLE12
+%define version 2.6.STABLE12
 
 ## Redefine configure values.
 %define         _bindir %{_prefix}/sbin
@@ -12,7 +12,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{version}
-Release:	%mkrel 2
+Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -38,11 +38,12 @@ Patch6: 	http://dansguardian.org/downloads/squid-xforward_logging.patch
 Patch7: 	squid-2.6.STABLE1-db4.diff
 Patch8: 	squid-2.6.STABLE1-visible_hostname.diff
 Patch9: 	squid-2.6.STABLE-smb-auth.diff
-# http://www.squid-cache.org/Advisories/SQUID-2007_1.txt
-Patch10:	http://www.squid-cache.org/Versions/v2/2.6/changesets/11349.patch
 # http://devel.squid-cache.org/projects.html#icap
-Patch300:	squid-2.6-icap.patch
+# http://devel.squid-cache.org/cgi-bin/diff2/icap-2.6.patch
+Patch300:	squid-2.6.STABLE12-icap.diff
 Patch301:	squid-2.6.STABLE1-getconf_mess.diff
+Patch400:	squid-2.6.STABLE12-fixcompile.diff
+Patch401:	squid-2.6.STABLE12-fd_note_static.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(pre): rpm-helper
@@ -116,10 +117,11 @@ done
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
-%patch10 -p1 -b .DoS
 
 %patch300 -p1 -b .ICAP
 %patch301 -p0 -b .getconf
+%patch400 -p1 -b .fixcompile
+%patch401 -p1 -b .note_static
 
 mkdir -p faq
 tar -jxf %{SOURCE2} -C faq
@@ -492,5 +494,3 @@ fi
 %attr(0644,root,root) %config(noreplace) /etc/httpd/conf/webapps.d/squid-cachemgr.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cachemgr.conf
 %attr(0755,root,squid) %{_var}/www/cgi-bin/cachemgr.cgi
-
-
