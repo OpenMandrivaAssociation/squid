@@ -12,7 +12,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{version}
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -146,6 +146,7 @@ perl -p -i -e "s|^icondir.*|icondir = \\$\(libexecdir\)/icons|" icons/Makefile.a
 grep -r "local/bin/perl" . |sed -e "s/:.*$//g" | xargs perl -p -i -e "s@local/bin/perl@bin/perl@g"
 
 %build
+%serverbuild
 rm -rf configure autom4te.cache
 libtoolize --copy --force
 aclocal
@@ -157,9 +158,9 @@ export SSLLIB="-L%{_libdir} `pkg-config --libs openssl`"
 export CPPFLAGS="-I%{_includedir}/openssl $CPPFLAGS"
 
 %ifarch x86_64
-export CFLAGS="%{optflags} -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 %else
-export CFLAGS="%{optflags} -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 %endif
 
 %configure2_5x \
