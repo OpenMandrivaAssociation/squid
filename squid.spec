@@ -1,5 +1,5 @@
-%define their_version 2.6.STABLE14
-%define version 2.6.STABLE14
+%define their_version 2.6.STABLE16
+%define version 2.6.STABLE16
 
 ## Redefine configure values.
 %define         _bindir %{_prefix}/sbin
@@ -31,7 +31,7 @@ Source11: 	squid.sysconfig
 Source12:	squid.pam-0.77
 Source13:	squid.pam
 Patch0:		squid-2.6.STABLE6-make.patch
-Patch1:		squid-2.5-config.patch
+Patch1:		squid-2.6-config.patch
 Patch2:		squid-2.5.STABLE9-user_group.patch
 Patch3:		squid-2.5.STABLE2-ssl.patch
 Patch6: 	http://dansguardian.org/downloads/squid-xforward_logging.patch
@@ -40,7 +40,7 @@ Patch8: 	squid-2.6.STABLE1-visible_hostname.diff
 Patch9: 	squid-2.6.STABLE-smb-auth.diff
 # http://devel.squid-cache.org/projects.html#icap
 # http://devel.squid-cache.org/cgi-bin/diff2/icap-2.6.patch
-Patch300:	squid-2.6.STABLE13-icap.diff
+Patch300:	squid-2.6.STABLE16-icap.diff
 Patch301:	squid-2.6.STABLE1-getconf_mess.diff
 Patch400:	squid-2.6.STABLE12-fixcompile.diff
 Patch401:	squid-2.6.STABLE12-fd_note_static.diff
