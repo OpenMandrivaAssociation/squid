@@ -1,5 +1,5 @@
-%define their_version 2.6.STABLE16
-%define version 2.6.STABLE16
+%define their_version 2.6.STABLE17
+%define version 2.6.STABLE17
 
 ## Redefine configure values.
 %define         _bindir %{_prefix}/sbin
@@ -16,8 +16,8 @@ Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
-Source0:	http://www.squid-cache.org/Versions/v2/2.6/squid-%{their_version}.tar.gz
-Source1:	http://www.squid-cache.org/Versions/v2/2.6/squid-%{their_version}.tar.gz.asc
+Source0:	http://www.squid-cache.org/Versions/v2/2.6/squid-%{their_version}.tar.bz2
+Source1:	http://www.squid-cache.org/Versions/v2/2.6/squid-%{their_version}.tar.bz2.asc
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
