@@ -57,7 +57,6 @@ BuildRequires:	pkgconfig
 BuildRequires:	libtool
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 Squid is a high-performance proxy caching server for Web clients,
