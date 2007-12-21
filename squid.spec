@@ -12,7 +12,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{version}
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -57,6 +57,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	libtool
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
+Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 Squid is a high-performance proxy caching server for Web clients,
