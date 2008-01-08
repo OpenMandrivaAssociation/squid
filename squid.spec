@@ -12,7 +12,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{version}
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -42,6 +42,8 @@ Patch9: 	squid-2.6.STABLE-smb-auth.diff
 # http://devel.squid-cache.org/cgi-bin/diff2/icap-2.6.patch
 Patch300:	squid-2.6.STABLE16-icap.diff
 Patch301:	squid-2.6.STABLE1-getconf_mess.diff
+# from http://qa.mandriva.com/show_bug.cgi?id=35992 comment #10
+Patch302:	squid-2.6.STABLE16-icap-fixleak.patch
 Patch400:	squid-2.6.STABLE12-fixcompile.diff
 Patch401:	squid-2.6.STABLE12-fd_note_static.diff
 Requires(post): rpm-helper
@@ -120,6 +122,7 @@ done
 
 %patch300 -p1 -b .ICAP
 %patch301 -p0 -b .getconf
+%patch302 -p1 -b .icapleak
 %patch400 -p1 -b .fixcompile
 %patch401 -p1 -b .note_static
 
