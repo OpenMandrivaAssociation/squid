@@ -54,6 +54,7 @@ BuildRequires:	openssl-devel >= 0.9.7
 BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
+BuildRequires:	krb5-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
