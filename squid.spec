@@ -12,7 +12,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	3.0
-Release:	%mkrel 0.1
+Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -57,6 +57,7 @@ BuildRequires:	libtool
 BuildRequires:	krb5-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
+Provides:	webproxy
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
@@ -513,4 +514,3 @@ fi
 %attr(0644,root,root) %config(noreplace) /etc/httpd/conf/webapps.d/squid-cachemgr.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cachemgr.conf
 %attr(0755,root,squid) %{_var}/www/cgi-bin/cachemgr.cgi
-
