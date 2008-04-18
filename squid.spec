@@ -1,4 +1,4 @@
-%define their_version %{version}.STABLE1
+%define their_version %{version}.STABLE4
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -9,10 +9,10 @@
 
 %define defaultmaxfiles 1024
 
-Summary:	The Squid proxy caching server
+Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
