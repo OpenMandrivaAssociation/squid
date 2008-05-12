@@ -1,4 +1,11 @@
-%define their_version %{version}.STABLE4
+%define build_test 1
+
+# commandline overrides:
+# rpm -ba|--rebuild --with 'xxx'
+%{?_with_test: %{expand: %%global build_test 1}}
+%{?_without_test: %{expand: %%global build_test 0}}
+
+%define their_version %{version}.STABLE5
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -12,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -34,7 +41,6 @@ Patch0:		squid-make.diff
 Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
-Patch6:		http://dansguardian.org/downloads/squid-xforward_logging.patch
 Patch7:		squid-db4.diff
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
@@ -57,20 +63,23 @@ BuildRequires:	libtool
 BuildRequires:	krb5-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
+%if %{build_test}
+BuildRequires:	cppunit-devel
+%endif
 Provides:	webproxy
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-Squid is a high-performance proxy caching server for Web clients,
-supporting FTP, gopher, and HTTP data objects. Unlike traditional
-caching software, Squid handles all requests in a single,
-non-blocking, I/O-driven process. Squid keeps meta data and especially
-hot objects cached in RAM, caches DNS lookups, supports non-blocking
-DNS lookups, and implements negative caching of failed requests.
+Squid is a high-performance proxy caching server for Web clients, supporting
+FTP, gopher, and HTTP data objects. Unlike traditional caching software, Squid
+handles all requests in a single, non-blocking, I/O-driven process. Squid keeps
+meta data and especially hot objects cached in RAM, caches DNS lookups,
+supports non-blocking DNS lookups, and implements negative caching of failed
+requests.
 
-Squid consists of a main server program squid, a Domain Name System
-lookup program (dnsserver), a program for retrieving FTP data
-(ftpget), and some management and client tools.
+Squid consists of a main server program squid, a Domain Name System lookup
+program (dnsserver), a program for retrieving FTP data (ftpget), and some
+management and client tools.
 
 Install squid if you need a proxy caching server.
 
@@ -80,6 +89,11 @@ can change these values at build time by using for example:
 --define 'maxfiles 4096'
 
 The package was built to support a maximum of %{?!maxfiles:%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}} filedescriptors.
+
+You can build %{name} with some conditional build swithes;
+
+(ie. use with rpm --rebuild):
+    --with[out]	test	Initiate the test suite
 
 %package	cachemgr
 Summary:	The Squid Cache Manager
@@ -114,7 +128,6 @@ done
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
 %patch3 -p0 -b .ssl
-#%patch6 -p1 -b .forward_logging
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
@@ -146,6 +159,9 @@ install -m 0644 %{SOURCE13} squid.pam
 perl -p -i -e "s|^SAMBAPREFIX.*|SAMBAPREFIX = /usr|" helpers/basic_auth/SMB/Makefile.*
 #perl -p -i -e "s|^icondir.*|icondir = \\$\(libexecdir\)/icons|" icons/Makefile.am icons/Makefile.*
 grep -r "local/bin/perl" . |sed -e "s/:.*$//g" | xargs perl -p -i -e "s@local/bin/perl@bin/perl@g"
+
+# libtool
+perl -pi -e "s|AC_PROG_RANLIB|AC_PROG_LIBTOOL|g" configure*
 
 %build
 %serverbuild
@@ -209,9 +225,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --with-openssl=%{_prefix} \
     --with-large-files \
     --with-build-environment=default \
-    %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}} \
-
-#    --enable-follow-x-forwarded-for \
+    %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
 
 # Some versions of autoconf fail to detect sys/resource.h correctly;
 # apparently because it generates a compiler warning.
@@ -233,8 +247,13 @@ fi
 
 #grep -r errors * |grep share | sed -e "s/:.*$//g" | xargs perl -p -i -e "s|usr/share/errors|usr/%{_lib}/squid/errors|g" 
 
+%if %{build_test}
+%check
+make check
+%endif
+
 %install
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+rm -rf %{buildroot}
 
 %makeinstall 
 
@@ -458,7 +477,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %clean
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
