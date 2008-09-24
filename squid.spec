@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define their_version %{version}.STABLE8
+%define their_version %{version}.STABLE9
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 7
+Release:	%mkrel 8
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -189,7 +189,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-xmalloc-statistics \
     --enable-carp \
     --enable-async-io \
-    --enable-storeio="aufs,coss,diskd,null,ufs" \
+    --enable-storeio="aufs,diskd,null,ufs" \
     --enable-disk-io="AIO,Blocking,DiskDaemon,DiskThreads" \
     --enable-removal-policies="heap,lru" \
     --enable-icmp \
