@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define their_version %{version}.STABLE11
+%define their_version %{version}.STABLE12
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 11
+Release:	%mkrel 12
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -166,11 +166,13 @@ perl -pi -e "s|AC_PROG_RANLIB|AC_PROG_LIBTOOL|g" configure*
 %build
 %serverbuild
 rm -rf configure autom4te.cache
-libtoolize --copy --force
-aclocal
-autoheader
-autoconf --force
-automake --foreign --add-missing --copy --force-missing
+#libtoolize --copy --force
+#aclocal
+#autoheader
+#autoconf --force
+#automake --foreign --add-missing --copy --force-missing
+
+sh ./bootstrap.sh
 
 export SSLLIB="-L%{_libdir} `pkg-config --libs openssl`"
 export CPPFLAGS="-I%{_includedir}/openssl $CPPFLAGS"
