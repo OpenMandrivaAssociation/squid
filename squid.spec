@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define their_version %{version}.STABLE14
+%define their_version %{version}.STABLE15
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 14
+Release:	%mkrel 15
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
