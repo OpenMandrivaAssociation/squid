@@ -138,7 +138,7 @@ done
 %patch11 -p0 -b .shutdown_lifetime
 %patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
-%patch14 -p0 -b .digest-rfc2069
+%patch14 -p1 -b .digest-rfc2069
 %patch301 -p0 -b .getconf
 
 mkdir -p faq
