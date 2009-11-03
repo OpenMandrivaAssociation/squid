@@ -130,7 +130,7 @@ done
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
 %patch3 -p0 -b .ssl
-%patch4 -p1 -b .with_new_linux_headers_capability
+%patch4 -p0 -b .with_new_linux_headers_capability
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
