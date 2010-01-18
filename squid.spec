@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 23
+Release:	%mkrel 24
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -37,6 +37,7 @@ Source10:	ERR_CUSTOM_ACCESS_DENIED.French
 Source11: 	squid.sysconfig
 Source12:	squid.pam-0.77
 Source13:	squid.pam
+Source14:	squid.ifup
 Patch0:		squid-make.diff
 Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
@@ -114,6 +115,7 @@ Requires:	%{name} = %{version}
 %description	cachemgr
 This package contains the Squid Cache Manager.
 
+
 %prep
 
 %setup -q -n squid-%{their_version}
@@ -151,6 +153,7 @@ install -m 0644 %{SOURCE6} smb.conf
 install -m 0644 %{SOURCE7} squid.conf.transparent
 install -m 0755 %{SOURCE8} rc.firewall
 install -m 0644 %{SOURCE11} squid.sysconfig
+install -m 0755 %{SOURCE14} squid.ifup
 
 # fix conditional pam config file
 %if %{mdkversion} < 200610
@@ -291,6 +294,7 @@ ln -fs %{_datadir}/%{name}/errors/English %{buildroot}%{_sysconfdir}/errors
 install -m0755 squid.init %{buildroot}%{_initrddir}/squid
 install -m0644 squid.logrotate %{buildroot}/etc/logrotate.d/squid
 install -m0644 squid.sysconfig %{buildroot}/etc/sysconfig/squid
+install -m0755 squid.ifup %{buildroot}/etc/sysconfig/network-scripts/ifup.d/squid
 install -m0644 helpers/basic_auth/MSNT/msntauth.conf.default %{buildroot}%{_sysconfdir}
 
 # fix docs
@@ -493,6 +497,7 @@ rm -rf %{buildroot}
 %attr(0644,root,root) %config(noreplace) /etc/pam.d/squid
 %attr(0644,root,root) %config(noreplace) /etc/sysconfig/squid
 %attr(0644,root,root) %config(noreplace) /etc/logrotate.d/squid
+%attr(0755,root,squid) %config(noreplace) /etc/sysconfig/network-scripts/ifup.d/squid
 %attr(0755,root,squid) %{_initrddir}/squid
 %{_sysconfdir}/errors
 %{_datadir}/%{name}/errors
