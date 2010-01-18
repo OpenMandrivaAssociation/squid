@@ -268,6 +268,7 @@ rm -rf %{buildroot}
 # make some directories
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}/etc/{logrotate.d,pam.d,sysconfig}
+install -d %{buildroot}/etc/sysconfig/network-scripts/ifup.d
 install -d %{buildroot}/etc/httpd/conf/webapps.d
 install -d %{buildroot}%{_datadir}/%{name}/{errors,icons}
 install -d %{buildroot}%{_datadir}/%{name}/errors/{English,French}
