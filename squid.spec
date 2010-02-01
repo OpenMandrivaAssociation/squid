@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define their_version %{version}.STABLE21
+%define their_version %{version}.STABLE22
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 27
+Release:	%mkrel 28
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -43,6 +43,7 @@ Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
 Patch4:		squid-3.0-with_new_linux_headers_capability.patch
+Patch5:		squid-3.0.STABLE22-no_more_HAVE_SPNEGO_fix.diff
 Patch7:		squid-db4.diff
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
@@ -133,6 +134,7 @@ done
 %patch2 -p0 -b .user_group
 %patch3 -p0 -b .ssl
 %patch4 -p0 -b .with_new_linux_headers_capability
+%patch5 -p0 -b .no_more_HAVE_SPNEGO_fix
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
