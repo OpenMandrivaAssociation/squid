@@ -43,7 +43,6 @@ Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
 Patch4:		squid-3.0-with_new_linux_headers_capability.patch
-Patch5:		squid-3.0.STABLE22-no_more_HAVE_SPNEGO_fix.diff
 Patch7:		squid-db4.diff
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
@@ -134,7 +133,6 @@ done
 %patch2 -p0 -b .user_group
 %patch3 -p0 -b .ssl
 %patch4 -p0 -b .with_new_linux_headers_capability
-%patch5 -p0 -b .no_more_HAVE_SPNEGO_fix
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
