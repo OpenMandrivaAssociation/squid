@@ -19,7 +19,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.0
-Release:	%mkrel 31
+Release:	%mkrel 32
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
