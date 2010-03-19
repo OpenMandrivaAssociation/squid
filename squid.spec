@@ -67,7 +67,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
 BuildRequires:	krb5-devel
-BuildRequires: ecap-devel
+#BuildRequires: ecap-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 %if %{build_test}
@@ -207,8 +207,8 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-delay-pools \
     --disable-esi \
     --enable-icap-client \
-    --enable-ecap \
-    --enable-useragent-log \
+     --disable-ecap \
+     --enable-useragent-log \
     --enable-referer-log \
     --enable-wccp \
     --enable-wccpv2 \
