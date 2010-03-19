@@ -5,7 +5,9 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define their_version %{version}.STABLE24
+%define squid_date 20100316
+%define squid_beta 18
+%define their_version 3.1.0.%{squid_beta}-%{squid_date}
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -18,13 +20,13 @@
 
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
-Version:	3.0
-Release:	%mkrel 34
+Version:	3.1.0
+Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
-Source0:	http://www.squid-cache.org/Versions/v3/3.0/squid-%{their_version}.tar.gz
-Source1:	http://www.squid-cache.org/Versions/v3/3.0/squid-%{their_version}.tar.gz.asc
+Source0:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2
+Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.md5
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
@@ -42,21 +44,21 @@ Patch0:		squid-make.diff
 Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
-Patch4:		squid-3.0-with_new_linux_headers_capability.patch
+#Patch4:		squid-3.0-with_new_linux_headers_capability.patch
 Patch7:		squid-db4.diff
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
 Patch10:	squid-cachemgr.conf_locationfix.diff
 Patch11:	squid-shutdown_lifetime.diff
-Patch12:	squid-no_-Werror.diff
+#Patch12:	squid-no_-Werror.diff
 Patch13:	squid-datadir.diff
-Patch14:	squid-digest-rfc2069.diff
-Patch15:	squid-3.0.24-digest-nonce.diff
+#Patch14:	squid-digest-rfc2069.diff
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
+BuildRequires:	libtool-devel
 BuildRequires:	db4-devel
 BuildRequires:	libsasl-devel
 BuildRequires:	openldap-devel
@@ -65,6 +67,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
 BuildRequires:	krb5-devel
+BuildRequires: ecap-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 %if %{build_test}
@@ -74,16 +77,16 @@ Provides:	webproxy
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-Squid is a high-performance proxy caching server for Web clients, supporting
-FTP, gopher, and HTTP data objects. Unlike traditional caching software, Squid
-handles all requests in a single, non-blocking, I/O-driven process. Squid keeps
-meta data and especially hot objects cached in RAM, caches DNS lookups,
-supports non-blocking DNS lookups, and implements negative caching of failed
-requests.
-
-Squid consists of a main server program squid, a Domain Name System lookup
-program (dnsserver), a program for retrieving FTP data (ftpget), and some
-management and client tools.
+quid is a high-performance proxy caching server for web clients, supporting 
+FTP, gopher, and HTTP data objects over IPv4 or IPv6. Unlike traditional 
+caching software, Squid handles all requests in a single, non-blocking, 
+asynchronous process.
+Squid keeps meta data and especially hot objects cached in RAM, caches DNS 
+lookups, supports non-blocking DNS lookups, and implements negative caching 
+of failed requests.  Squid supports SSL, extensive access controls, and full 
+request logging. By using the lightweight Internet Cache Protocol (ICP) and 
+HTTP Cache Protocol (HTCP) Squid caches can be arranged in a hierarchy or 
+mesh for additional bandwidth savings.
 
 Install squid if you need a proxy caching server.
 
@@ -129,21 +132,20 @@ for i in `find . -type d -name CVS`  `find . -type d -name .svn` `find . -type f
     if [ -e "$i" ]; then rm -rf $i; fi >&/dev/null
 done
 
-%patch0 -p0 -b .make
+%patch0 -p1 -b .make
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
-%patch3 -p0 -b .ssl
-%patch4 -p0 -b .with_new_linux_headers_capability
+%patch3 -p1 -b .ssl
+#%patch4 -p0 -b .with_new_linux_headers_capability
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
 %patch9 -p0 -b .backslashes
-%patch10 -p0 -b .cachemgr.conf_locationfix
+%patch10 -p1 -b .cachemgr.conf_locationfix
 %patch11 -p0 -b .shutdown_lifetime
-%patch12 -p1 -b .no_-Werror
+#%patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
 #%patch14 -p1 -b .digest-rfc2069
-%patch15 -p0 -b .digest-nonce
-%patch301 -p0 -b .getconf
+%patch301 -p1 -b .getconf
 
 mkdir -p faq
 tar -jxf %{SOURCE2} -C faq
@@ -199,13 +201,13 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-xmalloc-statistics \
     --enable-carp \
     --enable-async-io \
-    --enable-storeio="aufs,diskd,null,ufs" \
-    --enable-disk-io="AIO,Blocking,DiskDaemon,DiskThreads" \
+    --enable-storeio="aufs,diskd,ufs" \
     --enable-removal-policies="heap,lru" \
     --enable-icmp \
     --enable-delay-pools \
     --disable-esi \
     --enable-icap-client \
+    --enable-ecap \
     --enable-useragent-log \
     --enable-referer-log \
     --enable-wccp \
@@ -225,7 +227,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-default-hostsfile=/etc/hosts \
     --enable-auth="basic,digest,negotiate,ntlm" \
     --enable-basic-auth-helpers="getpwnam,LDAP,MSNT,multi-domain-NTLM,NCSA,PAM,SMB,YP,SASL,POP3,DB,squid_radius_auth" \
-    --enable-ntlm-auth-helpers="fakeauth,no_check,SMB" \
+    --enable-ntlm-auth-helpers="fakeauth,no_check,smb_lm" \
     --enable-negotiate-auth-helpers="squid_kerb_auth" \
     --enable-digest-auth-helpers="password,ldap,eDirectory" \
     --enable-external-acl-helpers="ip_user,ldap_group,session,unix_group,wbinfo_group" \
@@ -235,7 +237,13 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --with-openssl=%{_prefix} \
     --with-large-files \
     --with-build-environment=default \
+    --enable-mit=`/usr/bin/krb5-config --prefix` \
+    --with-logdir=%{_logdir}/squid \
+    --enable-http-violations \
     %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
+
+
+#    --enable-disk-io="AIO,Blocking,DiskDaemon,DiskThreads" \
 
 # Some versions of autoconf fail to detect sys/resource.h correctly;
 # apparently because it generates a compiler warning.
@@ -291,7 +299,7 @@ pushd errors
 	fi
     done
 popd
-ln -fs %{_datadir}/%{name}/errors/English %{buildroot}%{_sysconfdir}/errors
+ln -fs %{_datadir}/%{name}/errors/templates %{buildroot}%{_sysconfdir}/errors
 
 # install config
 install -m0755 squid.init %{buildroot}%{_initrddir}/squid
@@ -502,6 +510,8 @@ rm -rf %{buildroot}
 %attr(0644,root,root) %config(noreplace) /etc/logrotate.d/squid
 %attr(0755,root,squid) %config(noreplace) /etc/sysconfig/network-scripts/ifup.d/squid
 %attr(0755,root,squid) %{_initrddir}/squid
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.css
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.documented
 %{_sysconfdir}/errors
 %{_datadir}/%{name}/errors
 %{_datadir}/%{name}/icons
@@ -515,9 +525,9 @@ rm -rf %{buildroot}
 %attr(0755,root,squid) %{_libexecdir}/ip_user_check
 %attr(0755,root,squid) %{_libexecdir}/msnt_auth
 %attr(0755,root,squid) %{_libexecdir}/ncsa_auth
-%attr(0755,root,squid) %{_libexecdir}/ntlm_auth
+#%attr(0755,root,squid) %{_libexecdir}/ntlm_auth
 %attr(0755,root,squid) %{_libexecdir}/pam_auth
-%attr(0755,root,squid) %{_libexecdir}/pinger
+%attr(4755,root,squid) %{_libexecdir}/pinger
 %attr(0755,root,squid) %{_libexecdir}/pop3.pl
 %attr(0755,root,squid) %{_libexecdir}/sasl_auth
 %attr(0755,root,squid) %{_libexecdir}/smb_auth
@@ -533,9 +543,14 @@ rm -rf %{buildroot}
 %attr(0755,root,squid) %{_libexecdir}/squid_unix_group
 %attr(0755,root,squid) %{_libexecdir}/wbinfo_group.pl
 %attr(0755,root,squid) %{_libexecdir}/yp_auth
+%attr(0755,root,squid) %{_libexecdir}/negotiate_kerb_auth
+%attr(0755,root,squid) %{_libexecdir}/negotiate_kerb_auth_test
+%attr(0755,root,squid) %{_libexecdir}/ntlm_smb_lm_auth
+%attr(0755,root,squid) %{_libexecdir}/squid_kerb_auth_test
 
 %{_sbindir}/*
 %attr(0644,root,root) %{_mandir}/man8/*
+%attr(0644,root,root) %{_mandir}/man1/squidclient.1.lzma
 %attr(0755,squid,squid) %dir %{_var}/run/squid
 %attr(0755,squid,squid) %dir %{_var}/log/squid
 %attr(0755,squid,squid) %dir %{_var}/spool/squid
