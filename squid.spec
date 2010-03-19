@@ -273,7 +273,7 @@ make check
 %install
 rm -rf %{buildroot}
 
-%makeinstall 
+%makeinstall DEFAULT_LOG_DIR=%{buildroot}%{_logdir}/squid
 
 # make some directories
 install -d %{buildroot}%{_initrddir}
