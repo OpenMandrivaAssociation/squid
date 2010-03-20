@@ -21,7 +21,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.1
+Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -67,7 +67,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
 BuildRequires:	krb5-devel
-#BuildRequires: ecap-devel
+BuildRequires: ecap-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 %if %{build_test}
@@ -207,8 +207,8 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-delay-pools \
     --disable-esi \
     --enable-icap-client \
-     --disable-ecap \
-     --enable-useragent-log \
+    --enable-ecap \
+    --enable-useragent-log \
     --enable-referer-log \
     --enable-wccp \
     --enable-wccpv2 \
