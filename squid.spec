@@ -15,13 +15,16 @@
 %define _initrddir /etc/rc.d/init.d/
 %define _sysconfdir /etc/squid
 %define  _localstatedir /var
+%define _datadir /usr/share/squid
+%define _mandir /usr/share/man
+%define _infodir /usr/share/info
 
 %define defaultmaxfiles 8192
 
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.3
+Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.4
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -53,6 +56,7 @@ Patch11:	squid-shutdown_lifetime.diff
 #Patch12:	squid-no_-Werror.diff
 Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
+#Patch15:	squid-3.1-error-make.diff
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -145,6 +149,7 @@ done
 #%patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
 #%patch14 -p1 -b .digest-rfc2069
+#%patch15 -p1 -b .errordir
 %patch301 -p1 -b .getconf
 
 mkdir -p faq
@@ -174,6 +179,7 @@ grep -r "local/bin/perl" . |sed -e "s/:.*$//g" | xargs perl -p -i -e "s@local/bi
 perl -pi -e "s|AC_PROG_RANLIB|AC_PROG_LIBTOOL|g" configure*
 
 %build
+
 %serverbuild
 rm -rf configure autom4te.cache
 #libtoolize --copy --force
@@ -273,33 +279,35 @@ make check
 %install
 rm -rf %{buildroot}
 
-%makeinstall DEFAULT_LOG_DIR=%{buildroot}%{_logdir}/squid
+%makeinstall icondir=%{buildroot}%{_datadir}/icons DEFAULT_LOG_DIR=%{buildroot}%{_logdir}/squid DEFAULT_ERROR_DIR=%{buildroot}%{_datadir}/errors DEFAULT_ICON_DIR=%{buildroot}%{_datadir}/icons
+
+
 
 # make some directories
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}/etc/{logrotate.d,pam.d,sysconfig}
 install -d %{buildroot}/etc/sysconfig/network-scripts/ifup.d
 install -d %{buildroot}/etc/httpd/conf/webapps.d
-install -d %{buildroot}%{_datadir}/%{name}/{errors,icons}
-install -d %{buildroot}%{_datadir}/%{name}/errors/{English,French}
+install -d %{buildroot}%{_datadir}/{errors,icons}
+install -d %{buildroot}%{_datadir}/errors/{English,French}
 install -d %{buildroot}%{_mandir}/man8
 install -d %{buildroot}%{_var}/www/cgi-bin
 install -d %{buildroot}%{_var}/log/squid
 install -d %{buildroot}%{_var}/run/squid
 install -d %{buildroot}%{_var}/spool/squid
-install -d %{buildroot}%{_datadir}/snmp/mibs
+install -d %{buildroot}/usr/share/snmp/mibs
 
-# fix error docs location
+# fix error docs location	
 rm -rf %{buildroot}%{_sysconfdir}/errors
 pushd errors
     for i in *; do
 	if [ -d $i ]; then
-	    install -d %{buildroot}%{_datadir}/%{name}/errors/$i
-	    install -m0644 $i/* %{buildroot}%{_datadir}/%{name}/errors/$i
+	    install -d %{buildroot}%{_datadir}/errors/$i
+	    install -m0644 $i/* %{buildroot}%{_datadir}/errors/$i
 	fi
     done
 popd
-ln -fs %{_datadir}/%{name}/errors/templates %{buildroot}%{_sysconfdir}/errors
+ln -fs %{_datadir}/errors/templates %{buildroot}%{_sysconfdir}/errors
 
 # install config
 install -m0755 squid.init %{buildroot}%{_initrddir}/squid
@@ -343,13 +351,13 @@ for manpage in `find -name "*.8"`; do
     install -m0644 $manpage %{buildroot}/%{_mandir}/man8/
 done
 
-install -m 0644 %{SOURCE9} %{buildroot}%{_datadir}/%{name}/errors/English/ERR_CUSTOM_ACCESS_DENIED
-install -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/%{name}/errors/French/ERR_CUSTOM_ACCESS_DENIED
+install -m 0644 %{SOURCE9} %{buildroot}%{_datadir}/errors/English/ERR_CUSTOM_ACCESS_DENIED
+install -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/errors/French/ERR_CUSTOM_ACCESS_DENIED
 
 install -m644 squid.pam %{buildroot}/etc/pam.d/squid
 
 # move the mib in-place
-mv %{buildroot}%{_datadir}/mib.txt %{buildroot}%{_datadir}/snmp/mibs/SQUID.txt
+mv %{buildroot}%{_datadir}/mib.txt %{buildroot}/usr/share/snmp/mibs/SQUID.txt
 
 # move cachemgr.cgi to a more safe location
 mv %{buildroot}%{_libexecdir}/cachemgr.cgi %{buildroot}%{_var}/www/cgi-bin/
@@ -369,7 +377,7 @@ rm -f %{buildroot}%{_libdir}/squid/no_check.pl
 #rm -rf %{buildroot}%{_datadir}/errors
 
 # nuke zero length files
-find %{buildroot}%{_datadir}/%{name}/errors/ -type f -size 0 -exec rm -f {} \;
+find %{buildroot}%{_datadir}/errors/ -type f -size 0 -exec rm -f {} \;
 
 %pre
 %_pre_useradd squid %{_var}/spool/squid /bin/false
@@ -513,8 +521,8 @@ rm -rf %{buildroot}
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.css
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.documented
 %{_sysconfdir}/errors
-%{_datadir}/%{name}/errors
-%{_datadir}/%{name}/icons
+%{_datadir}/errors
+%{_datadir}/icons
 %{_libexecdir}/diskd
 %{_libexecdir}/unlinkd
 %attr(0755,root,squid) %{_libexecdir}/digest_edir_auth
@@ -554,7 +562,7 @@ rm -rf %{buildroot}
 %attr(0755,squid,squid) %dir %{_var}/run/squid
 %attr(0755,squid,squid) %dir %{_var}/log/squid
 %attr(0755,squid,squid) %dir %{_var}/spool/squid
-%attr(0644,root,squid) %{_datadir}/snmp/mibs/SQUID.txt
+%attr(0644,root,squid) /usr/share/snmp/mibs/SQUID.txt
 
 %files cachemgr
 %defattr(-,root,root)
