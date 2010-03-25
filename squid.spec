@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define squid_date 20100316
+%define squid_date 20100324
 %define squid_beta 18
 %define their_version 3.1.0.%{squid_beta}-%{squid_date}
 
@@ -15,16 +15,16 @@
 %define _initrddir /etc/rc.d/init.d/
 %define _sysconfdir /etc/squid
 %define  _localstatedir /var
-%define _datadir /usr/share/squid
-%define _mandir /usr/share/man
-%define _infodir /usr/share/info
+%define _datadir %{_usr}/share/squid
+%define _mandir %{_usr}/share/man
+%define _infodir %{_usr}/share/info
 
 %define defaultmaxfiles 8192
 
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.6
+Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.7
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -245,6 +245,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --with-build-environment=default \
     --enable-mit=`/usr/bin/krb5-config --prefix` \
     --with-logdir=%{_logdir}/squid \
+    --with-pidfile=%{_var}/run/squid \
     --enable-http-violations \
     %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
 
