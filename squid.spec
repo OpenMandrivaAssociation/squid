@@ -5,7 +5,7 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define squid_date 20100324
+%define squid_date 20100327
 %define squid_beta 18
 %define their_version 3.1.0.%{squid_beta}-%{squid_date}
 
@@ -24,7 +24,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.8
+Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.9
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -245,7 +245,6 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --with-build-environment=default \
     --enable-mit=`/usr/bin/krb5-config --prefix` \
     --with-logdir=%{_logdir}/squid \
-    --with-pidfile=%{_var}/run/squid/squid.pid \
     --enable-http-violations \
     %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
 
@@ -294,7 +293,7 @@ install -d %{buildroot}%{_datadir}/errors/{English,French}
 install -d %{buildroot}%{_mandir}/man8
 install -d %{buildroot}%{_var}/www/cgi-bin
 install -d %{buildroot}%{_var}/log/squid
-install -d %{buildroot}%{_var}/run/squid
+#install -d %{buildroot}%{_var}/run/squid
 install -d %{buildroot}%{_var}/spool/squid
 install -d %{buildroot}/usr/share/snmp/mibs
 
@@ -560,7 +559,7 @@ rm -rf %{buildroot}
 %{_sbindir}/*
 %attr(0644,root,root) %{_mandir}/man8/*
 %attr(0644,root,root) %{_mandir}/man1/squidclient.1.lzma
-%attr(0755,squid,squid) %dir %{_var}/run/squid
+#%attr(0755,squid,squid) %dir %{_var}/run/squid
 %attr(0755,squid,squid) %dir %{_var}/log/squid
 %attr(0755,squid,squid) %dir %{_var}/spool/squid
 %attr(0644,root,squid) /usr/share/snmp/mibs/SQUID.txt
