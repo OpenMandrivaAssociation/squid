@@ -7,7 +7,8 @@
 
 %define squid_date 20100327
 %define squid_beta 18
-%define their_version 3.1.0.%{squid_beta}-%{squid_date}
+##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
+%define their_version 3.1.1
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -24,12 +25,12 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 0.0.beta%{squid_beta}.%{squid_date}.9
+Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
 Source0:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2
-Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.md5
+Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.asc
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
