@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -82,7 +82,7 @@ Provides:	webproxy
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-quid is a high-performance proxy caching server for web clients, supporting 
+Squid is a high-performance proxy caching server for web clients, supporting 
 FTP, gopher, and HTTP data objects over IPv4 or IPv6. Unlike traditional 
 caching software, Squid handles all requests in a single, non-blocking, 
 asynchronous process.
