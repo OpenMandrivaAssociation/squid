@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -58,6 +58,7 @@ Patch11:	squid-shutdown_lifetime.diff
 Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
+Patch16:	squid-3.1.1-mysql-helper-joomla.diff
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -151,6 +152,7 @@ done
 %patch13 -p1 -b .datadir
 #%patch14 -p1 -b .digest-rfc2069
 #%patch15 -p1 -b .errordir
+%patch16 -p0 -b .joomla
 %patch301 -p1 -b .getconf
 
 mkdir -p faq
