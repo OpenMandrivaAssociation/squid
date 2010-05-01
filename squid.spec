@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.1
+%define their_version 3.1.2
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 7
+Release:	%mkrel 9
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -58,7 +58,7 @@ Patch11:	squid-shutdown_lifetime.diff
 Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
-Patch16:	squid-3.1.1-mysql-helper-joomla.diff
+Patch16:	squid-3.1.2-mysql-helper-joomla.diff
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
