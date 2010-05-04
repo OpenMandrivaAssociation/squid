@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 11
+Release:	%mkrel 12
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -250,7 +250,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-mit=`/usr/bin/krb5-config --prefix` \
     --with-logdir=%{_logdir}/squid \
     --enable-http-violations \
-    --enable-follow-x-forwarded-for \
+    --enable-zph-qos \
     %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
 
 
