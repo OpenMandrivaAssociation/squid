@@ -516,6 +516,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc faq/* C* S* R* Q* rc.firewall *.conf* doc/*.txt
 %exclude %{_sysconfdir}/cachemgr.conf
+%dir %_sysconfdir
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.default
 %attr(0644,root,root) %config(noreplace) /etc/pam.d/squid
