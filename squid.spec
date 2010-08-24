@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.6
+%define their_version 3.1.7
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
