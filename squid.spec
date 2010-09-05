@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 20
+Release:	%mkrel 21
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -73,7 +73,8 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
 BuildRequires:	krb5-devel
-BuildRequires: ecap-devel
+BuildRequires:	ecap-devel
+BuildRequires:	cap-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 %if %{build_test}
