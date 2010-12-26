@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.9
+%define their_version 3.1.10
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -154,7 +154,7 @@ done
 #%patch14 -p1 -b .digest-rfc2069
 #%patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
-%patch301 -p1 -b .getconf
+#%patch301 -p1 -b .getconf
 
 mkdir -p faq
 tar -jxf %{SOURCE2} -C faq
@@ -565,7 +565,7 @@ rm -rf %{buildroot}
 
 %{_sbindir}/*
 %attr(0644,root,root) %{_mandir}/man8/*
-%attr(0644,root,root) %{_mandir}/man1/squidclient.1.lzma
+%attr(0644,root,root) %{_mandir}/man1/*
 #%attr(0755,squid,squid) %dir %{_var}/run/squid
 %attr(0755,squid,squid) %dir %{_var}/log/squid
 %attr(0755,squid,squid) %dir %{_var}/spool/squid
