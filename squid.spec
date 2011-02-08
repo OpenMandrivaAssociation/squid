@@ -64,6 +64,7 @@ Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
+BuildRequires:	bzip2
 BuildRequires:	libtool-devel
 BuildRequires:	db4-devel
 BuildRequires:	libsasl-devel
