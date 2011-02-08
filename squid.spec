@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.10
+%define their_version 3.1.11
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 24
+Release:	%mkrel 25
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -143,16 +143,16 @@ done
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
 %patch3 -p1 -b .ssl
-#%patch4 -p0 -b .with_new_linux_headers_capability
+#patch4 -p0 -b .with_new_linux_headers_capability
 %patch7 -p1 -b .db4
 %patch8 -p0 -b .visible_hostname
-%patch9 -p0 -b .backslashes
+%patch9 -p1 -b .backslashes
 %patch10 -p1 -b .cachemgr.conf_locationfix
 %patch11 -p0 -b .shutdown_lifetime
-#%patch12 -p1 -b .no_-Werror
+#patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
-#%patch14 -p1 -b .digest-rfc2069
-#%patch15 -p1 -b .errordir
+#patch14 -p1 -b .digest-rfc2069
+#patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
 #%patch301 -p1 -b .getconf
 
