@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.11
+%define their_version 3.1.12.1
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	3.1
-Release:	%mkrel 26
+Release:	%mkrel 27
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -66,7 +66,7 @@ Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 BuildRequires:	bzip2
 BuildRequires:	libtool-devel
-BuildRequires:	db4-devel
+BuildRequires:	db5-devel
 BuildRequires:	libsasl-devel
 BuildRequires:	openldap-devel
 BuildRequires:	openssl-devel >= 0.9.7
