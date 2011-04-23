@@ -49,7 +49,7 @@ Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
 #Patch4:		squid-3.0-with_new_linux_headers_capability.patch
-Patch7:		squid-db4.diff
+Patch7:		squid-3.1.9-ltdl.patch
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
 Patch10:	squid-cachemgr.conf_locationfix.diff
@@ -145,7 +145,7 @@ done
 %patch2 -p0 -b .user_group
 %patch3 -p1 -b .ssl
 #patch4 -p0 -b .with_new_linux_headers_capability
-%patch7 -p1 -b .db4
+%patch7 -p1 -b .libltdl
 %patch8 -p0 -b .visible_hostname
 %patch9 -p1 -b .backslashes
 %patch10 -p1 -b .cachemgr.conf_locationfix
@@ -196,17 +196,18 @@ rm -rf configure autom4te.cache
 sh ./bootstrap.sh
 
 export SSLLIB="-L%{_libdir} `pkg-config --libs openssl`"
-export CPPFLAGS="-I%{_includedir}/openssl $CPPFLAGS"
+export CPPFLAGS="-I%{_includedir}/openssl -I%{_includedir}/db51 %optflags "
 
 %ifarch x86_64
-export CFLAGS="$CFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -I%{_includedir}/db51 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 export CXXFLAGS="$CXXFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 %else
-export CFLAGS="$CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -I%{_includedir}/db51 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 %endif
 
 %configure2_5x \
+    --disable-strict-error-checking \
     --enable-shared=yes \
     --enable-static=no \
     --enable-xmalloc-statistics \
