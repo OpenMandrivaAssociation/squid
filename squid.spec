@@ -66,11 +66,7 @@ Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 BuildRequires:	bzip2
 BuildRequires:	libtool-devel
-%if %mdkversion < 201100
-BuildRequires:	db4-devel
-%else
-BuildRequires:	db5-devel
-%endif
+BuildRequires:	db-devel
 BuildRequires:	libsasl-devel
 BuildRequires:	openldap-devel
 BuildRequires:	openssl-devel >= 0.9.7
@@ -200,13 +196,13 @@ rm -rf configure autom4te.cache
 sh ./bootstrap.sh
 
 export SSLLIB="-L%{_libdir} `pkg-config --libs openssl`"
-export CPPFLAGS="-I%{_includedir}/openssl -I%{_includedir}/db51 %optflags "
+export CPPFLAGS="-I%{_includedir}/openssl -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` %optflags "
 
 %ifarch x86_64
-export CFLAGS="$CFLAGS -I%{_includedir}/db51 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 export CXXFLAGS="$CXXFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 %else
-export CFLAGS="$CFLAGS -I%{_includedir}/db51 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$CFLAGS -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 %endif
 
