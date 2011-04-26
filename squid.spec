@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	%{their_version}
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -66,7 +66,11 @@ Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 BuildRequires:	bzip2
 BuildRequires:	libtool-devel
+%if %mdkversion < 201100
+BuildRequires:	db4-devel
+%else
 BuildRequires:	db5-devel
+%endif
 BuildRequires:	libsasl-devel
 BuildRequires:	openldap-devel
 BuildRequires:	openssl-devel >= 0.9.7
