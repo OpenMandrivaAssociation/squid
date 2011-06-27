@@ -59,6 +59,7 @@ Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
 Patch16:	squid-3.1.4-mysql-helper-joomla.diff
+Patch17:	squid-3.1-10320.patch
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -155,6 +156,7 @@ done
 #patch14 -p1 -b .digest-rfc2069
 #patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
+%patch17 -p0  -b .fix
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
