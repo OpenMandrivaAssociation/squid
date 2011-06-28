@@ -141,6 +141,7 @@ for i in `find . -type d -name CVS`  `find . -type d -name .svn` `find . -type f
     if [ -e "$i" ]; then rm -rf $i; fi >&/dev/null
 done
 
+
 %patch0 -p1 -b .make
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
