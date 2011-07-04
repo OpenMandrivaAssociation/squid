@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.12.3
+%define their_version 3.1.14
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	%{their_version}
-Release:	%mkrel 3
+Release:	%mkrel 1
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -59,7 +59,7 @@ Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
 Patch16:	squid-3.1.4-mysql-helper-joomla.diff
-Patch17:	squid-3.1-10320.patch
+#Patch17:	squid-3.1-10320.patch
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -157,7 +157,7 @@ done
 #patch14 -p1 -b .digest-rfc2069
 #patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
-%patch17 -p0  -b .fix
+#patch17 -p0  -b .fix
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
