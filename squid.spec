@@ -25,12 +25,12 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	%{their_version}
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
 Source0:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2
-#Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.asc
+Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.asc
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
@@ -173,10 +173,14 @@ install -m 0644 %{SOURCE11} squid.sysconfig
 install -m 0755 %{SOURCE14} squid.ifup
 
 # fix conditional pam config file
-%if %{mdkversion} < 200610
-install -m 0644 %{SOURCE12} squid.pam
+%if %{distribution} == "Mandriva Linux"
+	%if %{mdkversion} < 200610
+	install -m 0644 %{SOURCE12} squid.pam
+	%else
+	install -m 0644 %{SOURCE13} squid.pam
+	%endif
 %else
-install -m 0644 %{SOURCE13} squid.pam
+	install -m 0644 %{SOURCE13} squid.pam
 %endif
 
 perl -p -i -e "s|^SAMBAPREFIX.*|SAMBAPREFIX = /usr|" helpers/basic_auth/SMB/Makefile.*
@@ -506,13 +510,17 @@ fi
 %_postun_userdel squid
 
 %post cachemgr
-%if %mdkversion < 201010
-%_post_webapp
+%if %{distribution} == "Mandriva Linux"
+	%if %mdkversion < 201010
+	%_post_webapp
+	%endif
 %endif
 
 %postun cachemgr
-%if %mdkversion < 201010
-%_postun_webapp
+%if %{distribution} == "Mandriva Linux"
+	%if %mdkversion < 201010
+	%_postun_webapp
+	%endif
 %endif
 
 %clean
