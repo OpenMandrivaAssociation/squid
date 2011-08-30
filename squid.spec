@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.14
+%define their_version 3.1.15
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,7 +25,7 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	%{their_version}
-Release:	%mkrel 2
+Release:	%mkrel 1
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -173,7 +173,7 @@ install -m 0644 %{SOURCE11} squid.sysconfig
 install -m 0755 %{SOURCE14} squid.ifup
 
 # fix conditional pam config file
-%if %{distribution} == "Mandriva Linux"
+%if "%{distribution}" == "Mandriva Linux"
 	%if %{mdkversion} < 200610
 	install -m 0644 %{SOURCE12} squid.pam
 	%else
@@ -509,17 +509,17 @@ fi
 %postun
 %_postun_userdel squid
 
-%post cachemgr
-%if %{distribution} == "Mandriva Linux"
+%if "%{distribution}" == "Mandriva Linux"
+	%post cachemgr
 	%if %mdkversion < 201010
-	%_post_webapp
+		%_post_webapp
 	%endif
 %endif
 
-%postun cachemgr
-%if %{distribution} == "Mandriva Linux"
+%if "%{distribution}" == "Mandriva Linux"
+	%postun cachemgr
 	%if %mdkversion < 201010
-	%_postun_webapp
+		%_postun_webapp
 	%endif
 %endif
 
