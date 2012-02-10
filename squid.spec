@@ -8,7 +8,7 @@
 %define squid_date 20100327
 %define squid_beta 18
 ##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.18
+%define their_version 3.1.19
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -60,7 +60,6 @@ Patch13:	squid-datadir.diff
 #Patch15:	squid-3.1-error-make.diff
 Patch16:	squid-3.1.4-mysql-helper-joomla.diff
 #Patch17:	squid-3.1-10320.patch
-Patch18:	squid-3.1-10415.patch
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -159,7 +158,6 @@ done
 #patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
 #patch17 -p0  -b .fix
-%patch18 -p0 -b .fix
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
