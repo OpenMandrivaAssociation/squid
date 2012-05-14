@@ -5,10 +5,10 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define squid_date 20100327
-%define squid_beta 18
-##%define their_version 3.1.0.%{squid_beta}-%{squid_date}
-%define their_version 3.1.19
+%define squid_date 20120514-r11557
+%define squid_beta 17
+##%define their_version 3.2.0.%{squid_beta}-%{squid_date}
+%define their_version 3.2.0.17
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -25,12 +25,12 @@
 Summary:	The Squid proxy caching server %{their_version}
 Name:		squid
 Version:	%{their_version}
-Release:	2
+Release:	1
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
-Source0:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2
-Source1:	http://www.squid-cache.org/Versions/v3/3.1/squid-%{their_version}.tar.bz2.asc
+Source0:	http://www.squid-cache.org/Versions/v3/3.2/squid-%{their_version}.tar.bz2
+Source1:	http://www.squid-cache.org/Versions/v3/3.2/squid-%{their_version}.tar.bz2.asc
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
@@ -44,15 +44,12 @@ Source11: 	squid.sysconfig
 Source12:	squid.pam-0.77
 Source13:	squid.pam
 Source14:	squid.ifup
-Patch0:		squid-make.diff
 Patch1:		squid-config.diff
 Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
 #Patch4:		squid-3.0-with_new_linux_headers_capability.patch
-Patch7:		squid-3.1.9-ltdl.patch
 Patch8:		squid-visible_hostname.diff
 Patch9:		squid-smb-auth.diff
-Patch10:	squid-cachemgr.conf_locationfix.diff
 Patch11:	squid-shutdown_lifetime.diff
 #Patch12:	squid-no_-Werror.diff
 Patch13:	squid-datadir.diff
@@ -142,15 +139,12 @@ for i in `find . -type d -name CVS`  `find . -type d -name .svn` `find . -type f
 done
 
 
-%patch0 -p1 -b .make
 %patch1 -p1 -b .config
 %patch2 -p0 -b .user_group
 %patch3 -p1 -b .ssl
 #patch4 -p0 -b .with_new_linux_headers_capability
-%patch7 -p1 -b .libltdl
 %patch8 -p0 -b .visible_hostname
 %patch9 -p1 -b .backslashes
-%patch10 -p1 -b .cachemgr.conf_locationfix
 %patch11 -p0 -b .shutdown_lifetime
 #patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
@@ -245,17 +239,18 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-linux-netfilter \
     --disable-ident-lookups \
     --enable-default-hostsfile=/etc/hosts \
-    --enable-auth="basic,digest,negotiate,ntlm" \
-    --enable-basic-auth-helpers="getpwnam,LDAP,MSNT,multi-domain-NTLM,NCSA,PAM,SMB,YP,SASL,POP3,DB,squid_radius_auth" \
-    --enable-ntlm-auth-helpers="fakeauth,no_check,smb_lm" \
-    --enable-negotiate-auth-helpers="squid_kerb_auth" \
-    --enable-digest-auth-helpers="password,ldap,eDirectory" \
+    --enable-auth \
+    --enable-basic-auth="getpwnam,LDAP,MSNT,multi-domain-NTLM,NCSA,PAM,SMB,YP,SASL,POP3,DB,squid_radius_auth" \
+    --enable-ntlm-auth="fakeauth,no_check,smb_lm" \
+    --enable-negotiate-auth="squid_kerb_auth" \
+    --enable-digest-auth="password,ldap,eDirectory" \
     --enable-external-acl-helpers="ip_user,ldap_group,session,unix_group,wbinfo_group" \
     --with-default-user=%{name} \
     --with-pthreads \
     --with-dl \
     --with-openssl=%{_prefix} \
     --with-large-files \
+    --with-swapdir=%{_localstatedir}/spool/squid \
     --with-build-environment=default \
     --enable-mit=`/usr/bin/krb5-config --prefix` \
     --with-logdir=%{_logdir}/squid \
@@ -337,30 +332,20 @@ cp helpers/basic_auth/LDAP/README README.auth_ldap
 cp helpers/basic_auth/MSNT/README.html README.auth_msnt.html
 cp helpers/basic_auth/MSNT/msntauth.conf.default .
 
-cp helpers/basic_auth/SASL/README README.auth_sasl
-cp helpers/basic_auth/SASL/squid_sasl_auth.conf .
+cp helpers/basic_auth/SASL/basic_sasl_auth.conf .
 
-cp helpers/basic_auth/SMB/README README.auth_smb
-cp helpers/basic_auth/multi-domain-NTLM/README.txt README.multi-domain-NTLM_basic_auth
+cp helpers/external_acl/file_userip/example.conf ip_user_external_acl.example.conf
+cp helpers/external_acl/file_userip/example-deny_all_but.conf ip_user_external_acl.example-deny_all_but.conf
 
-cp helpers/external_acl/ip_user/README README.ip_user_external_acl
-cp helpers/external_acl/ip_user/example.conf ip_user_external_acl.example.conf
-cp helpers/external_acl/ip_user/example-deny_all_but.conf ip_user_external_acl.example-deny_all_but.conf
+cp helpers/external_acl/LDAP_group/ChangeLog ChangeLog.ldap_group_external_acl
 
-cp helpers/external_acl/ldap_group/README README.ldap_group_external_acl
-cp helpers/external_acl/ldap_group/ChangeLog ChangeLog.ldap_group_external_acl
+head -19 helpers/basic_auth/NCSA/basic_ncsa_auth.cc > README.NCSA_basic_auth
+head -56 helpers/basic_auth/PAM/basic_pam_auth.cc > README.PAM_basic_auth
+head -21 helpers/basic_auth/getpwnam/basic_getpwnam_auth.cc > README.getpwnam_basic_auth
+head -32 helpers/digest_auth/LDAP/digest_pw_auth.cc > README.ldap_digest_auth
 
-cp helpers/external_acl/unix_group/README README.unix_group_external_acl
-cp helpers/ntlm_auth/no_check/README.no_check_ntlm_auth README.no_check_ntlm_auth
-
-head -19 helpers/basic_auth/NCSA/ncsa_auth.c > README.NCSA_basic_auth
-head -56 helpers/basic_auth/PAM/pam_auth.c > README.PAM_basic_auth
-head -21 helpers/basic_auth/getpwnam/getpwnam_auth.c > README.getpwnam_basic_auth
-head -32 helpers/digest_auth/password/digest_pw_auth.c > README.password_digest_auth
-head -32 helpers/digest_auth/ldap/digest_pw_auth.c > README.ldap_digest_auth
-
-install -m0755 helpers/basic_auth/SMB/smb_auth.sh %{buildroot}%{_libexecdir}
-install -m0755 helpers/basic_auth/SASL/squid_sasl_auth %{buildroot}%{_libexecdir}
+install -m0755 helpers/basic_auth/SMB/basic_smb_auth.sh %{buildroot}%{_libexecdir}
+install -m0755 helpers/basic_auth/SASL/basic_sasl_auth %{buildroot}%{_libexecdir}
 
 for manpage in `find -name "*.8"`; do
     install -m0644 $manpage %{buildroot}/%{_mandir}/man8/
@@ -545,36 +530,37 @@ rm -rf %{buildroot}
 %{_datadir}/icons
 %{_libexecdir}/diskd
 %{_libexecdir}/unlinkd
-%attr(0755,root,squid) %{_libexecdir}/digest_edir_auth
+%attr(0755,root,squid) %{_libexecdir}/digest_edirectory_auth
 %attr(0755,root,squid) %{_libexecdir}/digest_ldap_auth
-%attr(0755,root,squid) %{_libexecdir}/digest_pw_auth
-%attr(0755,root,squid) %{_libexecdir}/fakeauth_auth
-%attr(0755,root,squid) %{_libexecdir}/getpwname_auth
-%attr(0755,root,squid) %{_libexecdir}/ip_user_check
-%attr(0755,root,squid) %{_libexecdir}/msnt_auth
-%attr(0755,root,squid) %{_libexecdir}/ncsa_auth
+%attr(0755,root,squid) %{_libexecdir}/digest_file_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_fake_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_getpwnam_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_msnt_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_ncsa_auth
 #%attr(0755,root,squid) %{_libexecdir}/ntlm_auth
-%attr(0755,root,squid) %{_libexecdir}/pam_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_pam_auth
 %attr(4755,root,squid) %{_libexecdir}/pinger
-%attr(0755,root,squid) %{_libexecdir}/pop3.pl
-%attr(0755,root,squid) %{_libexecdir}/sasl_auth
-%attr(0755,root,squid) %{_libexecdir}/smb_auth
-%attr(0755,root,squid) %{_libexecdir}/smb_auth.pl
-%attr(0755,root,squid) %{_libexecdir}/smb_auth.sh
-%attr(0755,root,squid) %{_libexecdir}/squid_db_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_kerb_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_ldap_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_ldap_group
-%attr(0755,root,squid) %{_libexecdir}/squid_radius_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_sasl_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_session
-%attr(0755,root,squid) %{_libexecdir}/squid_unix_group
-%attr(0755,root,squid) %{_libexecdir}/wbinfo_group.pl
-%attr(0755,root,squid) %{_libexecdir}/yp_auth
-%attr(0755,root,squid) %{_libexecdir}/negotiate_kerb_auth
-%attr(0755,root,squid) %{_libexecdir}/negotiate_kerb_auth_test
+%attr(0755,root,squid) %{_libexecdir}/basic_pop3_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_sasl_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_smb_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_smb_auth.sh
+%attr(0755,root,squid) %{_libexecdir}/basic_db_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_ldap_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_radius_auth
+%attr(0755,root,squid) %{_libexecdir}/ext_session_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_unix_group_acl
+%attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth
+%attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth_test
 %attr(0755,root,squid) %{_libexecdir}/ntlm_smb_lm_auth
-%attr(0755,root,squid) %{_libexecdir}/squid_kerb_auth_test
+%attr(0755,root,squid) %{_libexecdir}/basic_msnt_multi_domain_auth
+%attr(0755,root,squid) %{_libexecdir}/basic_nis_auth
+%attr(0755,root,squid) %{_libexecdir}/ext_wbinfo_group_acl
+%attr(0755,root,squid) %{_libexecdir}/helper-mux.pl
+%attr(0755,root,squid) %{_libexecdir}/log_file_daemon
+%attr(0755,root,squid) %{_libexecdir}/negotiate_wrapper_auth
+%attr(0755,root,squid) %{_libexecdir}/ntlm_fake_auth
+%attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite
+%attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite.sh
 
 %{_sbindir}/*
 %attr(0644,root,root) %{_mandir}/man8/*
