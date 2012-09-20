@@ -5,10 +5,10 @@
 %{?_with_test: %{expand: %%global build_test 1}}
 %{?_without_test: %{expand: %%global build_test 0}}
 
-%define squid_date 20120514-r11557
-%define squid_beta 17
+#define squid_date 20120514-r11557
+#define squid_beta 17
 ##%define their_version 3.2.0.%{squid_beta}-%{squid_date}
-%define their_version 3.2.0.17
+%define their_version 3.2.1
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -80,7 +80,6 @@ BuildRequires:	cap-devel
 BuildRequires:	cppunit-devel
 %endif
 Provides:	webproxy
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Squid is a high-performance proxy caching server for web clients, supporting 
@@ -508,12 +507,9 @@ fi
 	%endif
 %endif
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root)
-%doc faq/* C* S* R* Q* rc.firewall *.conf* doc/*.txt
+%doc faq/* C* R* Q* rc.firewall *.conf* doc/*.txt
 %exclude %{_sysconfdir}/cachemgr.conf
 %dir %_sysconfdir
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.conf
