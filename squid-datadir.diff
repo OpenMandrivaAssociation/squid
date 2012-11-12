@@ -1,0 +1,45 @@
+--- squid-3.1.0.16-20100224/errors/Makefile.am	2010-02-23 20:39:59.000000000 -0600
++++ squid-3.1.0.16-20100224.dlucio/errors/Makefile.am	2010-02-24 11:59:01.243082651 -0600
+@@ -3,7 +3,7 @@
+ # $Id$
+ #
+ 
+-errordir = $(datadir)/errors
++errordir = $(datadir)/squid/errors
+ 
+ ##dist-hook eveything
+ 
+--- squid-3.2.0.17/doc/Makefile.am.orig	2012-05-14 16:36:45.488335604 +0100
++++ squid-3.2.0.17/doc/Makefile.am	2012-05-14 16:37:17.931336910 +0100
+@@ -3,7 +3,7 @@
+ 
+ DEFAULT_CONFIG_FILE = $(sysconfdir)/squid.conf
+ DEFAULT_MIME_TABLE      = $(sysconfdir)/mime.conf
+-DEFAULT_ERROR_DIR       = $(datadir)/errors
++DEFAULT_ERROR_DIR       = $(datadir)/squid/errors/@ERR_DEFAULT_LANGUAGE@
+ 
+ EXTRA_DIST = \
+ 	debug-sections.txt
+--- squid-3.2.0.17/icons/Makefile.am.orig	2012-05-14 16:38:00.951338668 +0100
++++ squid-3.2.0.17/icons/Makefile.am	2012-05-14 16:37:43.545337974 +0100
+@@ -1,6 +1,6 @@
+ include $(top_srcdir)/icons/list
+ 
+-icondir = $(datadir)/icons/silk
++icondir = $(datadir)/squid/icons/silk
+ icon_DATA = $(ICONS)
+ EXTRA_DIST = $(ICONS) list SN.png
+ DISTCLEANFILES = 
+--- squid-3.2.0.17/src/Makefile.am.orig	2012-05-14 16:38:51.597340722 +0100
++++ squid-3.2.0.17/src/Makefile.am	2012-05-14 16:39:20.140341884 +0100
+@@ -870,8 +870,8 @@
+ DEFAULT_UNLINKD		= $(libexecdir)/`echo unlinkd | sed '$(transform);s/$$/$(EXEEXT)/'`
+ DEFAULT_LOGFILED	= $(libexecdir)/`echo log_file_daemon | sed '$(transform);s/$$/$(EXEEXT)/'`
+ DEFAULT_DISKD		= $(libexecdir)/`echo diskd | sed '$(transform);s/$$/$(EXEEXT)/'`
+-DEFAULT_ICON_DIR	= $(datadir)/icons
+-DEFAULT_ERROR_DIR	= $(datadir)/errors
++DEFAULT_ICON_DIR	= $(datadir)/squid/icons
++DEFAULT_ERROR_DIR	= $(datadir)/squid/errors/@ERR_DEFAULT_LANGUAGE@
+ 
+ # Make location configure settings available to the code
+ DEFS += -DDEFAULT_CONFIG_FILE=\"$(DEFAULT_CONFIG_FILE)\" -DDEFAULT_SQUID_DATA_DIR=\"$(datadir)\" -DDEFAULT_SQUID_CONFIG_DIR=\"$(sysconfdir)\"
