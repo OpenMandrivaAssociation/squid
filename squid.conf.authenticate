@@ -1,0 +1,81 @@
+# Have a look also at the rc.firewall file and at the 
+# /usr/lib/squid/errors/English(or French)/ERR_CUSTOM_ACCESS_DENIED files 
+http_port 3128
+icp_port 0
+hierarchy_stoplist cgi-bin ?
+acl QUERY urlpath_regex cgi-bin \?
+no_cache deny QUERY
+cache_mem 16 MB
+cache_dir diskd /var/spool/squid 200 16 256
+cache_store_log none
+debug_options ALL,1
+redirect_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
+
+#auth_param basic
+#program /usr/lib/squid/pam_auth
+#auth_param basic children 5
+#auth_param basic realm Squid proxy-caching web server
+#auth_param basic credentialsttl 2 hours
+
+#	make sure you add the user using smbpasswd -a -U username
+#	then create a file called /var/lib/samba/netlogon/proxyauth
+#	and simply enter an allow line
+#auth_param basic
+#program /usr/lib/squid/smb_auth -W MANDRAKESOFT
+#auth_param basic children 5
+#auth_param basic realm Squid proxy-caching web server
+#auth_param basic credentialsttl 2 hours
+
+auth_param basic
+program /usr/lb/squid/squid_ldap_auth -b ou=people,dc=example,dc=com 192.168.100.75
+auth_param basic children 5
+auth_param basic realm Squid proxy-caching web server
+auth_param basic credentialsttl 2 hours 
+
+
+#	make sure you install the ypbind package and run the ypbind service and
+#	add a line like ypserver your_server_name in /etc/yp.conf
+# do a chmod 7755 /usr/lib/squid/yp_auth as root
+#auth_param basic
+#program /usr/lib/squid/yp_auth yp.mandrakesoft.com yp_list.byname
+#auth_param basic children 5
+#auth_param basic realm Squid proxy-caching web server
+#auth_param basic credentialsttl 2 hours
+
+authenticate_children 5
+authenticate_ttl 1 hour
+authenticate_ip_ttl 60 seconds
+half_closed_clients off
+acl password proxy_auth REQUIRED
+acl all src 0.0.0.0/0.0.0.0
+acl manager proto cache_object
+acl localhost src 127.0.0.1/255.255.255.255
+acl SSL_ports port 443 563
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 443 563	# https, snews
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 210		# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 777		# multiling http
+acl CONNECT method CONNECT
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost
+http_access allow password
+http_access deny all
+icp_access allow all
+miss_access allow all
+proxy_auth_realm MandrakeSoft Squid proxy-caching web server
+visible_hostname firewall.mandrakesoft.com
+httpd_accel_host virtual
+httpd_accel_with_proxy  on
+httpd_accel_uses_host_header on
+append_domain .mandrakesoft.com
+err_html_text florin@mandrakesoft.com
+memory_pools off

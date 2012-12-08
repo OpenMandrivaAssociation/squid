@@ -1,16 +1,3 @@
 sources:
-  "ERR_CUSTOM_ACCESS_DENIED.English:"	6542234c19f2aaa1b7689d5c68c61300e9fcb52c
-  "ERR_CUSTOM_ACCESS_DENIED.French:"	92a5cb154150440feaaf9f5a8256d0d35733d918
-  "FAQ.tar.bz2:"	997f42cb83f3ed8d8c160c402dac4b43a11c11e8
-  "rc.firewall:"	1835ab110eb80dda2b3db541ab2b20c72d515311
-  "smb.conf:"	02e9fb3b2c474567ea06f993e2ec20d7f392ab39
-  "squid-3.2.1.tar.bz2:"	896b50960c2ae327966b8c3715f3e73be9e4b24a
-  "squid-3.2.1.tar.bz2.asc:"	aea79652427873403bcef3a15c96fed54ab964e2
-  "squid.conf.authenticate:"	4551a6b02027b5a145c469b52134090dce7ea049
-  "squid.conf.transparent:"	08d3062d09642341d45195de56f581f56c99d87c
-  "squid.ifup:"	2d64721087ea47da35da2b17f58e18c2b87aa472
-  "squid.init:"	907be0e7cb4ff5ac10127b81441e1f044b61453c
-  "squid.logrotate:"	3854032f5f10f0e11724d19fc7bfc75e1d08d466
-  "squid.pam:"	07801cffb7cde64bd80d94276a9af472f04c653d
-  "squid.pam-0.77:"	8d85b961b7af0c9151d0d2eca0073ec4405b4bf7
-  "squid.sysconfig:"	abc9d8d7b16dc91c0db48ce6e1231bdbab1655a9
+  "FAQ.tar.bz2": 997f42cb83f3ed8d8c160c402dac4b43a11c11e8
+  "squid-3.2.0.17.tar.bz2": 438ce0afaeef8a6b902a153fc02438213b598bc6

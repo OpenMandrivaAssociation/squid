@@ -1,0 +1,70 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.4.1-12mdk i686) [Netscape]">
+   <title>&lt;FONT COLOR="#00FF00">Web Browser Configuration&lt;/FONT></title>
+</head>
+<body text="#FFFFFF" bgcolor="#666699">
+&nbsp;
+<h2>
+<font color="#00FF00">Veuillez reconfigurer votre navigateur</font></h2>
+&nbsp;
+<table COLS=1 WIDTH="100%" NOSAVE >
+<tr NOSAVE>
+<td NOSAVE><font color="#FFFF00">Pour Netscape ou Mozilla aller &agrave;:</font></td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>Edition->Pr&eacute;ferences->Avanc&eacute;es->Proxy->Configuration
+manuelle du proxy->Afficher</td>
+</tr>
+
+<tr>
+<td>Dans la case Proxy HTTP entrer l'adresse IP interne du firewall et
+dans la case&nbsp;</td>
+</tr>
+
+<tr>
+<td>de droite entrer le port Squid : 3128
+&nbsp;</td>
+</tr>
+<tr>
+	<td></td>
+</tr>
+
+<tr>
+	<td>Vous pouvez aussi choisir Configuration automatique du proxy et entrer</td>
+</tr>
+
+<tr>
+	<td>
+
+	</td>
+</tr>
+</table>
+
+<br>&nbsp;
+<table COLS=1 WIDTH="100%" NOSAVE >
+<tr>
+<td><font color="#FFFF00">Pour Internet Explorer aller &agrave;:</font></td>
+</tr>
+
+<tr>
+<td>Outils->Options Internet->Connexion->Param&egrave;tres->Proxy</td>
+</tr>
+
+<tr NOSAVE>
+<td NOSAVE>Entrer ensuite l'adresse IP interne du firewall et dans la case&nbsp;</td>
+</tr>
+
+<tr>
+<td>de droite entrer le port Squid : 3128
+&nbsp;</td>
+</tr>
+</table>
+
+<p><font color="#00FF00">Si vous rencontrez des difficult&eacute;s, contactez
+votre admin<BR><A HREF=mailto:%L>%L</A></font>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# eth1 is the external interface and 192.168.2.178 is the internal address of teh squid server
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -A FORWARD -i eth1 -o eth2 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth1 -j ACCEPT
+iptables -t nat -A PREROUTING -p tcp -d 0.0.0.0/0 --dport 80 -j DNAT --to 192.168.2.178:3128
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+# Mandrake-Security : if you remove this comment, remove the next line too.
+echo 1 > /proc/sys/net/ipv4/conf/all/rp_filter

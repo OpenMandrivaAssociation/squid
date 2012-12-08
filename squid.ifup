@@ -1,0 +1,40 @@
+#!/bin/sh                                                        
+if [ -f /etc/sysconfig/squid ]; then
+  . /etc/sysconfig/squid
+fi
+
+SQUID_AUTO_RELOAD=${SQUID_AUTO_RELOAD:-"yes"}
+
+[ ${SQUID_AUTO_RELOAD} = "no" ] && exit 0
+
+
+RELOAD=0                                                         
+for IP in $(/sbin/ip addr show dev $1 | grep "inet "|cut -f6 -d ' ' | cut -f1 -d '/');
+  do                                                                                  
+    echo $IP                                                                          
+
+    for SQ in $(/bin/grep -E "^http_port" /etc/squid/squid.conf| /bin/awk -F " " '{print $2}'|/bin/cut -f1 -d ':' - |/bin/grep ':');
+      do
+        echo $SQ
+        if [[ $IP = $SQ ]]
+          then
+          RELOAD=1
+          else
+          RELOAD=0
+        fi
+      done
+  done
+
+for SQ in $(/bin/grep -E "^http_port" /etc/squid/squid.conf| /bin/awk -F " " '{print $2}'|/bin/cut -f1 -d ':' - |/bin/grep -v ':');
+do
+  RELOAD=1
+done
+
+
+/etc/init.d/squid status
+if [ $? -eq 0 ] ; then
+	if [ $RELOAD -eq 1 ] ; then
+	  echo "Reloading Squid"
+	  /usr/sbin/squid -k reconfigure
+	fi
+fi
