@@ -1,14 +1,13 @@
-%define build_test 0
+#% define with test 0
 
 # commandline overrides:
 # rpm -ba|--rebuild --with 'xxx'
-%{?_with_test: %{expand: %%global build_test 1}}
-%{?_without_test: %{expand: %%global build_test 0}}
+%bcond_with test
 
-%define squid_date 20120514-r11557
-%define squid_beta 17
-##%define their_version 3.2.0.%{squid_beta}-%{squid_date}
-%define their_version 3.2.0.17
+%define squid_date 20130108
+%define squid_beta 0
+##%define their_version 3.2.1.%{squid_beta}-%{squid_date}
+%define their_version 3.2.6
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -41,6 +40,7 @@ Source8:	rc.firewall
 Source9:	ERR_CUSTOM_ACCESS_DENIED.English
 Source10:	ERR_CUSTOM_ACCESS_DENIED.French
 Source11: 	squid.sysconfig
+Source12:	squid.pam-0.77
 Source13:	squid.pam
 Source14:	squid.ifup
 Patch1:		squid-config.diff
@@ -55,7 +55,7 @@ Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
 Patch16:	squid-3.1.4-mysql-helper-joomla.diff
-#Patch17:	squid-3.1-10320.patch
+Patch17:	squid-3.2.5-automake-1.13.patch
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -75,7 +75,7 @@ BuildRequires:	ecap-devel
 BuildRequires:	cap-devel
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
-%if %{build_test}
+%if %{with test}
 BuildRequires:	cppunit-devel
 %endif
 Provides:	webproxy
@@ -111,13 +111,9 @@ Summary:	The Squid Cache Manager
 Group:		System/Servers
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
-Requires(pre):	apache-conf >= 2.0.54
 Requires(pre):	apache >= 2.0.54
-Requires(pre):	apache-modules >= 2.0.54
 Requires(pre):	%{name} = %{version}
-Requires:	apache-conf >= 2.0.54
 Requires:	apache >= 2.0.54
-Requires:	apache-modules >= 2.0.54
 Requires:	%{name} = %{version}
 
 %description	cachemgr
@@ -149,7 +145,7 @@ done
 #patch14 -p1 -b .digest-rfc2069
 #patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
-#patch17 -p0  -b .fix
+%patch17 -p1 -b .automake-1_13
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
@@ -165,7 +161,7 @@ install -m 0644 %{SOURCE11} squid.sysconfig
 install -m 0755 %{SOURCE14} squid.ifup
 
 # fix conditional pam config file
-	install -m 0644 %{SOURCE13} squid.pam
+install -m 0644 %{SOURCE13} squid.pam
 
 perl -p -i -e "s|^SAMBAPREFIX.*|SAMBAPREFIX = /usr|" helpers/basic_auth/SMB/Makefile.*
 #perl -p -i -e "s|^icondir.*|icondir = \\$\(libexecdir\)/icons|" icons/Makefile.am icons/Makefile.*
@@ -271,7 +267,7 @@ fi
 
 #grep -r errors * |grep share | sed -e "s/:.*$//g" | xargs perl -p -i -e "s|usr/share/errors|usr/%{_lib}/squid/errors|g" 
 
-%if %{build_test}
+%if %{with test}
 %check
 make check
 %endif
@@ -355,9 +351,14 @@ mv %{buildroot}%{_libexecdir}/cachemgr.cgi %{buildroot}%{_var}/www/cgi-bin/
 # provide a simple apache config
 cat > %{buildroot}/etc/httpd/conf/webapps.d/squid-cachemgr.conf << EOF
 <Location /cgi-bin/cachemgr.cgi>
+%if %{mdvver} < 2013
     Order deny,allow
     Deny from all
     Allow from 127.0.0.1
+%endif
+%if %{mdvver} >= 2013
+    Require local granted
+%endif
     ErrorDocument 403 "Access denied per /etc/httpd/conf/webapps.d/squid-cachemgr.conf"
 </Location>
 EOF
@@ -485,7 +486,7 @@ fi
 %_postun_userdel squid
 
 %files
-%doc faq/* C* S* R* Q* rc.firewall *.conf* doc/*.txt
+%doc faq/* C* R* Q* rc.firewall *.conf* doc/*.txt
 %exclude %{_sysconfdir}/cachemgr.conf
 %dir %_sysconfdir
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.conf
@@ -546,421 +547,3 @@ fi
 %attr(0644,root,root) %config(noreplace) /etc/httpd/conf/webapps.d/squid-cachemgr.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cachemgr.conf
 %attr(0755,root,squid) %{_var}/www/cgi-bin/cachemgr.cgi
-
-
-%changelog
-* Mon May 14 2012 Crispin Boylan <crisb@mandriva.org> 3.2.0.17-1
-+ Revision: 798852
-- New release (compatible with ecap 0.2.0)
-- Rebuild
-
-  + Luis Daniel Lucio Quiroz <dlucio@mandriva.org>
-    - 3.1.19
-
-* Sat Dec 10 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.18-1
-+ Revision: 740153
-- 3.1.18
-  p18 to fix compilling
-- 3.1.18
-  p18 to fix compilling
-
-* Sun Oct 16 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.16-1
-+ Revision: 704840
-- 3.1.16
-
-* Tue Aug 30 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.15-1
-+ Revision: 697414
-- 3.1.15
-  we keep sync with mageia :)
-- Trying to make a single RPM compatible with both distros, anyway it helps me to maintain both
-- 3.1.14
-  P17 merged upstream
-
-* Tue Jun 28 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.12.3-3
-+ Revision: 687614
-- P17 rediffed
-- P17 fixed
-- S1 out, no avaliable by now at mainstream
-- 3.1.12.3
-
-* Thu Jun 02 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.12.2-3
-+ Revision: 682409
-- 3.1.12.2
-
-  + Funda Wang <fwang@mandriva.org>
-    - really enable backport updates
-
-* Tue Apr 26 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1.12.1-2
-+ Revision: 659199
-- db4 backport support
-
-* Sat Apr 23 2011 Funda Wang <fwang@mandriva.org> 3.1.12.1-1
-+ Revision: 656790
-- use upstream version
-- use system libtool
-- use db5.1 path patch
-- disable error checking
-
-  + Luis Daniel Lucio Quiroz <dlucio@mandriva.org>
-    - 3.1.12.1
-      P0 rediffed
-
-  + Zé <ze@mandriva.org>
-    - fix config file (mandriva bug 63066) to avoid squid to exist abnormally due to a fatal error
-
-* Tue Feb 08 2011 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-26
-+ Revision: 636915
-- new BR
-- 3.1.11
-  P9 rediffed
-
-* Wed Dec 29 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-24mdv2011.0
-+ Revision: 625818
-- build against new ecap
-
-* Sun Dec 26 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-23mdv2011.0
-+ Revision: 625267
-- 3.1.10
-  some patches diffed
-
-* Tue Oct 26 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-22mdv2011.0
-+ Revision: 589422
-- 3.1.9
-
-* Sun Sep 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-21mdv2011.0
-+ Revision: 576170
-- cap-devel need as BR because TPROXY
-- 3.1.8
-
-* Sun Sep 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-19mdv2011.0
-+ Revision: 576158
-- 3.1.8
-
-* Tue Aug 24 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-18mdv2011.0
-+ Revision: 572941
-- 3.1.7
-- 3.1.7
-
-* Fri Aug 06 2010 Michael Scherer <misc@mandriva.org> 3.1-17mdv2011.0
-+ Revision: 567144
-- fix License
-- do not let unowned configuration directory
-
-* Thu Aug 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-16mdv2011.0
-+ Revision: 566464
-- P10 rediff
-- 3.1.6
-
-* Sat Jul 03 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-15mdv2011.0
-+ Revision: 549771
-- 3.1.5
-
-* Tue Jun 01 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-14mdv2010.1
-+ Revision: 546846
-- 3.1.4
-  P7 & P16 rediffed
-
-* Fri May 07 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-13mdv2010.1
-+ Revision: 543540
-- P16 rediff for more cool options
-
-* Wed May 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-12mdv2010.1
-+ Revision: 542230
-- typo
-
-* Tue May 04 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-11mdv2010.1
-+ Revision: 542203
-- Some cool options to make squid rocks
-
-* Sun May 02 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-10mdv2010.1
-+ Revision: 541661
-- 3.1.3
-
-* Sat May 01 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-9mdv2010.1
-+ Revision: 541454
-- 3.1.2
-  P16 rediffed
-- Dont reload ifup if squid is not running
-- icapd as suggest
-
-* Sun Apr 25 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-7mdv2010.1
-+ Revision: 538529
-- P16 fixin a dbh->disconnect issue
-
-* Fri Apr 23 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-6mdv2010.1
-+ Revision: 538071
-- P16: we get rid  of lot of warnings
-
-* Thu Apr 22 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-5mdv2010.1
-+ Revision: 538045
-- typo in P16
-
-* Thu Apr 22 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-4mdv2010.1
-+ Revision: 538033
-- P16 to add support to auth against joomla db
-
-* Tue Apr 20 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-3mdv2010.1
-+ Revision: 537235
-- Typo
-
-* Mon Apr 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-2mdv2010.1
-+ Revision: 531755
-- Rebuild for new OpenSSL
-
-* Tue Mar 30 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-1mdv2010.1
-+ Revision: 528940
-- 3.1.1 stable
-
-* Sat Mar 27 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100327.9mdv2010.1
-+ Revision: 527891
-- New snapshot
-  Hopefully we have fixed the initrd start failure
-  We put now pid file in /var/run as Squid3.1 can modify by configure option its path
-
-* Thu Mar 25 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100324.8mdv2010.1
-+ Revision: 527325
-+ rebuild (emptylog)
-
-* Thu Mar 25 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100324.7mdv2010.1
-+ Revision: 527320
-- New snapshoot:
-  No pinger, as upstream has disable because there are problems
-  We put now squid.pid file in place, so init.d service should start now okay
-
-* Mon Mar 22 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.6mdv2010.1
-+ Revision: 526606
--D off from squid.init
-
-* Mon Mar 22 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.5mdv2010.1
-+ Revision: 526404
-- Getting rid of -D complain
-
-* Sun Mar 21 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.4mdv2010.1
-+ Revision: 526284
-+ rebuild (emptylog)
-
-* Sun Mar 21 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.3mdv2010.1
-+ Revision: 525980
-- P1 rediff to let squid 3.1 auto-localize feature work
-
-* Sat Mar 20 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.2mdv2010.1
-+ Revision: 525374
-- Ecap enabled
-
-* Sat Mar 20 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.1-0.0.beta18.20100316.1mdv2010.1
-+ Revision: 525365
-- No ecap by now
-- 3.1 beta18 hits!
-  P4, not needed anymore, Sq3.1 is awared of new kernel header
-  P12, is not needed by now (could be  --disable-strict-error-checkin)
-  P15, merged upstream
-  New storio-io and disk-io handlers
-  SMB auth helper has been renamed to smb_lm
-  We need to tell Squid if it uses MIT or Heimdal, MIT by now
-  Several files fixes
-
-* Mon Mar 15 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-34mdv2010.1
-+ Revision: 519942
-- New stable 25
-
-* Mon Mar 08 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-33mdv2010.1
-+ Revision: 516138
-- P15 to fix a cosmetic issue with Digest related to nonce, will remove on next stable
-
-* Fri Feb 26 2010 Oden Eriksson <oeriksson@mandriva.com> 3.0-32mdv2010.1
-+ Revision: 511640
-- rebuilt against openssl-0.9.8m
-
-* Wed Feb 24 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-31mdv2010.1
-+ Revision: 510496
-- squid cert for https reverse
-
-* Fri Feb 12 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-30mdv2010.1
-+ Revision: 504967
-- STABLE24, it fix a DoS with HTCP
-
-* Tue Feb 02 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-29mdv2010.1
-+ Revision: 499738
-- P5 dropped, merged upstream
-- New 3.0.23
-
-* Mon Feb 01 2010 Oden Eriksson <oeriksson@mandriva.com> 3.0-28mdv2010.1
-+ Revision: 499085
-- 3.0.STABLE22
-- P5: fix build
-
-* Tue Jan 19 2010 Guillaume Rousse <guillomovitch@mandriva.org> 3.0-27mdv2010.1
-+ Revision: 493884
-- rely on filetrigger for reloading apache configuration begining with 2010.1, rpm-helper macros otherwise
-
-* Tue Jan 19 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-26mdv2010.1
-+ Revision: 493476
-- squid autoreload sintax error, fixed
-- squid autoreload sintax error, fixed
-
-* Mon Jan 18 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-25mdv2010.1
-+ Revision: 493437
-- new var in sysconfig
-
-* Mon Jan 18 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-24mdv2010.1
-+ Revision: 493430
-- New S14 to fix #56191
-
-* Thu Dec 24 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-23mdv2010.1
-+ Revision: 482163
-- Stable 21
-
-* Tue Nov 03 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-22mdv2010.1
-+ Revision: 460411
-- P4 rediffed, P14 dropped merged upstream
-
-* Thu Oct 15 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-21mdv2010.0
-+ Revision: 457479
-- 8192 descriptors by default, this will help squid performance in mid-size to huge-size deployments
-
-* Fri Sep 25 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 3.0-20mdv2010.0
-+ Revision: 448587
-- SPEC minor change in .patch14
-- Redif patch 14, to let it work
-- Fix RFC2069 bug
-  http://bugs.squid-cache.org/show_bug.cgi?id=2773
-
-* Sat Sep 12 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-19mdv2010.0
-+ Revision: 438551
-- 3.0.STABLE19
-
-* Wed Aug 05 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-18mdv2010.0
-+ Revision: 410317
-- 3.0.STABLE18
-
-* Sun Jul 26 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-17mdv2010.0
-+ Revision: 400457
-- 3.0.STABLE17
-
-* Thu Jun 18 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-16mdv2010.0
-+ Revision: 387108
-- 3.0.STABLE16
-- rediffed one patch
-- added a patch from gentoo that makes it build
-
-* Wed May 13 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-15mdv2010.0
-+ Revision: 375343
-- 3.0.STABLE15
-
-* Sat Apr 11 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-14mdv2009.1
-+ Revision: 366234
-- 3.0.STABLE14
-
-* Thu Feb 05 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-13mdv2009.1
-+ Revision: 337774
-- 3.0.STABLE13
-
-* Sat Jan 31 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-12mdv2009.1
-+ Revision: 335757
-- 3.0.STABLE12
-
-* Tue Jan 13 2009 Oden Eriksson <oeriksson@mandriva.com> 3.0-11mdv2009.1
-+ Revision: 329210
-- 3.0.STABLE11
-
-* Wed Dec 17 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-10mdv2009.1
-+ Revision: 315098
-- rediffed fuzzy patches
-
-* Mon Oct 27 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-9mdv2009.1
-+ Revision: 297562
-- 3.0.STABLE10
-- rediffed P10
-
-* Wed Sep 24 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-8mdv2009.0
-+ Revision: 287774
-- 3.0.STABLE9
-- rediffed P1,P13
-
-* Mon Aug 11 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-7mdv2009.0
-+ Revision: 270890
-- 3.0.STABLE8
-
-* Tue Jun 24 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-6mdv2009.0
-+ Revision: 228604
-- 3.0.STABLE7
-- really fix #41121
-- revert to the old behaviour
-- fix #41121 (squid init script reinitializes alternate format swap_dir's)
-
-* Wed May 28 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-5mdv2009.0
-+ Revision: 212752
-- disable the cppunit test suite for now, enable it later
-- 3.0.STABLE6
-
-* Mon May 12 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-4mdv2009.0
-+ Revision: 206214
-- rebuild
-- 3.0.STABLE5
-- drop the squid-xforward_logging patch, it's not maintained
-- revert the "conform to the 2008 specs (don't start the services per
-  default)" changes and let this be handled some other way...
-- enable the test suite (with a conditional twist)
-
-* Fri Apr 18 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-2mdv2009.0
-+ Revision: 195627
-- 3.0.STABLE4
-
-* Mon Feb 18 2008 Oden Eriksson <oeriksson@mandriva.com> 3.0-1mdv2008.1
-+ Revision: 171230
-- add a virtal provides of webproxy
-
-* Tue Jan 29 2008 Andreas Hasenack <andreas@mandriva.com> 3.0-0.1mdv2008.1
-+ Revision: 159758
-- add krb5-devel to buildrequires
-- from oden: updated to version 3.0.STABLE1
-
-* Wed Jan 23 2008 Thierry Vignaud <tv@mandriva.org> 2.6.STABLE17-4mdv2008.1
-+ Revision: 157273
-- rebuild with fixed %%serverbuild macro
-
-* Tue Jan 08 2008 Andreas Hasenack <andreas@mandriva.com> 2.6.STABLE17-3mdv2008.1
-+ Revision: 146558
-- fix icap memory leak (#35992)
-
-* Fri Dec 21 2007 Oden Eriksson <oeriksson@mandriva.com> 2.6.STABLE17-2mdv2008.1
-+ Revision: 136292
-- rebuilt against new build deps
-
-  + Thierry Vignaud <tv@mandriva.org>
-    - kill re-definition of %%buildroot on Pixel's request
-
-* Mon Dec 03 2007 Andreas Hasenack <andreas@mandriva.com> 2.6.STABLE17-1mdv2008.1
-+ Revision: 114478
-- updated to version 2.6.17
-
-* Thu Sep 06 2007 Oden Eriksson <oeriksson@mandriva.com> 2.6.STABLE16-1mdv2008.0
-+ Revision: 80633
-- 2.6.STABLE16
-- rediffed P1,P300
-
-* Wed Aug 08 2007 Oden Eriksson <oeriksson@mandriva.com> 2.6.STABLE14-1mdv2008.0
-+ Revision: 60347
-- 2.6.STABLE13
-- obey the 2008 specs (don't start it per default)
-
-* Wed Jun 27 2007 Andreas Hasenack <andreas@mandriva.com> 2.6.STABLE13-3mdv2008.0
-+ Revision: 45067
-- rebuild with new serverbuild macro (-fstack-protector-all)
-
-* Fri Jun 22 2007 Andreas Hasenack <andreas@mandriva.com> 2.6.STABLE13-2mdv2008.0
-+ Revision: 43207
-- use serverbuild macro
-
-* Mon Jun 04 2007 Oden Eriksson <oeriksson@mandriva.com> 2.6.STABLE13-1mdv2008.0
-+ Revision: 35116
-- 2.6.STABLE13
-- rediffed P300
-
-* Mon Jun 04 2007 Oden Eriksson <oeriksson@mandriva.com> 2.6.STABLE12-1mdv2008.0
-+ Revision: 35052
-- 2.6.STABLE12
-- new icap patch (P300)
-- compile fixes conserning P300 by boklm (P400,P401)
-- drop upstream applied patches; P10
-

@@ -18,8 +18,7 @@
 # Required-Stop: $network
 # Should-Start: $named icapd
 # Should-Stop: $named 
-# Default-Start: $named
-# Default-Stop: $named
+# Default-Start: 3 4 5
 # Short-Description: Starts the squid daemon
 # Description: Squid is a full-featured web proxy cache with support for \
 #				many protocols, cache hierarchies, transparent proxy and \
@@ -78,7 +77,7 @@ start() {
 
     if [ ! -d $adir/00 ]; then 
 	echo -n "init_cache_dir $adir... "
-	$SQUID -z -F -D >> /var/log/squid/squid.out 2>&1
+	$SQUID -z -F >> /var/log/squid/squid.out 2>&1
     fi
 
     echo -n $"Starting $prog: "

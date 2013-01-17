@@ -1,3 +1,6 @@
+removed_sources:
+  squid-3.2.0.17.tar.bz2: 438ce0afaeef8a6b902a153fc02438213b598bc6
 sources:
-  "FAQ.tar.bz2": 997f42cb83f3ed8d8c160c402dac4b43a11c11e8
-  "squid-3.2.0.17.tar.bz2": 438ce0afaeef8a6b902a153fc02438213b598bc6
+  FAQ.tar.bz2: 997f42cb83f3ed8d8c160c402dac4b43a11c11e8
+  squid-3.2.6.tar.bz2: 00d6020959bc2ebb5ce1e1037211bb143c6ec1e4
+  squid-3.2.6.tar.bz2.asc: 7bdbe3a8c921c6dce5b9f2f3416f1b82eb57f7a1
