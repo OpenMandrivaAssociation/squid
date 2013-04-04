@@ -64,7 +64,7 @@ Requires(postun): rpm-helper
 BuildRequires:	bzip2
 BuildRequires:	libtool-devel
 BuildRequires:	db-devel
-BuildRequires:	libsasl-devel
+BuildRequires:	sasl-devel
 BuildRequires:	openldap-devel
 BuildRequires:	openssl-devel >= 0.9.7
 BuildRequires:	pam-devel
