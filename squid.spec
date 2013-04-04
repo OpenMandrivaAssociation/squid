@@ -526,7 +526,6 @@ fi
 %attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth_test
 %attr(0755,root,squid) %{_libexecdir}/ntlm_smb_lm_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_msnt_multi_domain_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_nis_auth
 %attr(0755,root,squid) %{_libexecdir}/ext_wbinfo_group_acl
 %attr(0755,root,squid) %{_libexecdir}/helper-mux.pl
 %attr(0755,root,squid) %{_libexecdir}/log_file_daemon
