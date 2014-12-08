@@ -7,7 +7,7 @@
 %define squid_date 20130108
 %define squid_beta 0
 ##%define their_version 3.2.1.%{squid_beta}-%{squid_date}
-%define their_version 3.2.6
+%define their_version 3.4.9
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -19,17 +19,20 @@
 %define _mandir %{_usr}/share/man
 %define _infodir %{_usr}/share/info
 
+%define major %(echo %{their_version} |cut -d. -f1)
+%define majorminor %(echo %{their_version} |cut -d. -f1-2)
+
 %define defaultmaxfiles 8192
 
-Summary:	The Squid proxy caching server %{their_version}
+Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{their_version}
-Release:	8
+Release:	1
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
-Source0:	http://www.squid-cache.org/Versions/v3/3.2/squid-%{their_version}.tar.bz2
-Source1:	http://www.squid-cache.org/Versions/v3/3.2/squid-%{their_version}.tar.bz2.asc
+Source0:	http://www.squid-cache.org/Versions/v%{major}/%{majorminor}/squid-%{their_version}.tar.xz
+Source1:	http://www.squid-cache.org/Versions/v%{major}/%{majorminor}/squid-%{their_version}.tar.xz.asc
 Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
 Source3:	squid.init
 Source4:	squid.logrotate
@@ -55,7 +58,6 @@ Patch13:	squid-datadir.diff
 #Patch14:	squid-digest-rfc2069.diff
 #Patch15:	squid-3.1-error-make.diff
 Patch16:	squid-3.1.4-mysql-helper-joomla.diff
-Patch17:	squid-3.2.5-automake-1.13.patch
 Patch301:	squid-getconf_mess.diff
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -134,10 +136,10 @@ done
 
 
 %patch1 -p1 -b .config
-%patch2 -p0 -b .user_group
+%patch2 -p1 -b .user_group
 %patch3 -p1 -b .ssl
 #patch4 -p0 -b .with_new_linux_headers_capability
-%patch8 -p0 -b .visible_hostname
+%patch8 -p1 -b .visible_hostname
 %patch9 -p1 -b .backslashes
 %patch11 -p0 -b .shutdown_lifetime
 #patch12 -p1 -b .no_-Werror
@@ -145,7 +147,6 @@ done
 #patch14 -p1 -b .digest-rfc2069
 #patch15 -p1 -b .errordir
 %patch16 -p0 -b .joomla
-%patch17 -p1 -b .automake-1_13
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
@@ -193,6 +194,8 @@ export CFLAGS="$CFLAGS -I`find /usr/include -type f -name db_185.h|head -n1|xarg
 export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 %endif
 
+# --enable-external-acl-helpers="ip_user,ldap_group,session,unix_group,wbinfo_group" \
+CC=gcc CXX=g++ \
 %configure2_5x \
     --disable-strict-error-checking \
     --enable-shared=yes \
@@ -230,7 +233,7 @@ export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
     --enable-ntlm-auth="fakeauth,no_check,smb_lm" \
     --enable-negotiate-auth="squid_kerb_auth" \
     --enable-digest-auth="password,ldap,eDirectory" \
-    --enable-external-acl-helpers="ip_user,ldap_group,session,unix_group,wbinfo_group" \
+    --enable-external-acl-helpers \
     --with-default-user=%{name} \
     --with-pthreads \
     --with-dl \
@@ -503,7 +506,6 @@ fi
 %{_datadir}/icons
 %{_libexecdir}/diskd
 %{_libexecdir}/unlinkd
-%attr(0755,root,squid) %{_libexecdir}/digest_edirectory_auth
 %attr(0755,root,squid) %{_libexecdir}/digest_ldap_auth
 %attr(0755,root,squid) %{_libexecdir}/digest_file_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_fake_auth
@@ -533,6 +535,18 @@ fi
 %attr(0755,root,squid) %{_libexecdir}/ntlm_fake_auth
 %attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite
 %attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite.sh
+%attr(0755,root,squid) %{_libexecdir}/basic_nis_auth
+%attr(0755,root,squid) %{_libexecdir}/cert_tool
+%attr(0755,root,squid) %{_libexecdir}/cert_valid.pl
+%attr(0755,root,squid) %{_libexecdir}/ext_edirectory_userip_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_file_userip_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_kerberos_ldap_group_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_ldap_group_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_sql_session_acl
+%attr(0755,root,squid) %{_libexecdir}/ext_time_quota_acl
+%attr(0755,root,squid) %{_libexecdir}/log_db_daemon
+%attr(0755,root,squid) %{_libexecdir}/storeid_file_rewrite
+
 
 %{_sbindir}/*
 %attr(0644,root,root) %{_mandir}/man8/*

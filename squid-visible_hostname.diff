@@ -1,11 +1,11 @@
---- src/cf.data.pre	2007-11-16 00:33:05.000000000 +0100
-+++ src/cf.data.pre.oden	2008-01-27 19:39:58.000000000 +0100
-@@ -3274,7 +3274,7 @@ DOC_END
+--- squid-3.4.9/src/cf.data.pre.visible_hostname	2014-12-08 15:53:33.281070200 +0100
++++ squid-3.4.9/src/cf.data.pre	2014-12-08 15:54:04.093684989 +0100
+@@ -5865,7 +5865,7 @@ DOC_END
  NAME: visible_hostname
  TYPE: string
  LOC: Config.visibleHostname
 -DEFAULT: none
 +DEFAULT: unconfigured
+ DEFAULT_DOC: Automatically detect the system host name
  DOC_START
  	If you want to present a special hostname in error messages, etc,
- 	define this.  Otherwise, the return value of gethostname()

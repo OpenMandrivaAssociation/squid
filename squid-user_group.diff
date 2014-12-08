@@ -1,6 +1,6 @@
---- src/cf.data.pre	2007-11-16 00:33:05.000000000 +0100
-+++ src/cf.data.pre.oden	2008-01-27 20:40:03.000000000 +0100
-@@ -3238,11 +3238,14 @@
+--- squid-3.4.9/src/cf.data.pre.user_group	2014-12-08 15:40:20.516981115 +0100
++++ squid-3.4.9/src/cf.data.pre	2014-12-08 15:53:03.928437158 +0100
+@@ -5822,11 +5822,14 @@ DOC_START
  	UID/GID to the user specified below.  The default is to change
  	to UID of @DEFAULT_CACHE_EFFECTIVE_USER@.
  	see also; cache_effective_group
@@ -13,10 +13,10 @@
  TYPE: string
 -DEFAULT: none
 +DEFAULT: @DEFAULT_CACHE_EFFECTIVE_USER@
+ DEFAULT_DOC: Use system group memberships of the cache_effective_user account
  LOC: Config.effectiveGroup
  DOC_START
- 	Squid sets the GID to the effective user's default group ID
-@@ -3260,6 +3263,9 @@
+@@ -5845,6 +5848,9 @@ DOC_START
  	This option is not recommended by the Squid Team.
  	Our preference is for administrators to configure a secure
  	user account for squid with UID/GID matching system policies.
