@@ -75,6 +75,7 @@ BuildRequires:	libtool
 BuildRequires:	krb5-devel
 BuildRequires:	ecap-devel
 BuildRequires:	cap-devel
+BuildRequires:	pkgconfig(libtirpc)
 #BuildRequires:	automake1.9
 #BuildRequires:	autoconf2.5
 %if %{with test}
