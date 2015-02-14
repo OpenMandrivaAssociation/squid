@@ -11,8 +11,9 @@
  	debug-sections.txt
 --- squid-3.4.9/errors/Makefile.am.datadir	2014-12-08 15:54:23.485442559 +0100
 +++ squid-3.4.9/errors/Makefile.am	2014-12-08 16:09:55.842786488 +0100
-@@ -1,6 +1,6 @@
- ## Process this file with automake to produce Makefile.in
+@@ -1,7 +1,7 @@
+ ## Please see the COPYING and CONTRIBUTORS files for details.
+ ##
  
 -errordir = $(datadir)/errors
 +errordir = $(datadir)/squid/errors
@@ -21,13 +22,14 @@
  
 --- squid-3.4.9/icons/Makefile.am.datadir	2014-10-31 10:36:43.000000000 +0100
 +++ squid-3.4.9/icons/Makefile.am	2014-12-08 15:54:23.485442559 +0100
-@@ -1,6 +1,6 @@
- include $(top_srcdir)/icons/list
+@@ -1,7 +1,7 @@
+
+ include $(top_srcdir)/icons/icon.list
  
 -icondir = $(datadir)/icons/silk
 +icondir = $(datadir)/squid/icons/silk
  icon_DATA = $(ICONS)
- EXTRA_DIST = $(ICONS) list SN.png
+ EXTRA_DIST = $(ICONS) icon.list SN.png
  DISTCLEANFILES = 
 --- squid-3.4.9/src/Makefile.am.datadir	2014-10-31 10:36:43.000000000 +0100
 +++ squid-3.4.9/src/Makefile.am	2014-12-08 15:54:23.486442546 +0100

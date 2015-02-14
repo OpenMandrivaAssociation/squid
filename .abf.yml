@@ -1,3 +1,5 @@
+removed_sources:
+  squid-3.4.9.tar.xz: 7d652e2f3794e15302d36700a167f16d24ad6cd5
 sources:
   FAQ.tar.bz2: 997f42cb83f3ed8d8c160c402dac4b43a11c11e8
-  squid-3.4.9.tar.xz: 7d652e2f3794e15302d36700a167f16d24ad6cd5
+  squid-3.5.1.tar.xz: a2b01afd33d1df3a234e1a5c3405d626f6cf0fb0

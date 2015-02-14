@@ -7,7 +7,7 @@
 %define squid_date 20130108
 %define squid_beta 0
 ##%define their_version 3.2.1.%{squid_beta}-%{squid_date}
-%define their_version 3.4.9
+%define their_version 3.5.1
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -27,7 +27,7 @@
 Summary:	The Squid proxy caching server
 Name:		squid
 Version:	%{their_version}
-Release:	2
+Release:	1
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squid-cache.org/
@@ -146,7 +146,7 @@ done
 %patch13 -p1 -b .datadir
 #patch14 -p1 -b .digest-rfc2069
 #patch15 -p1 -b .errordir
-%patch16 -p0 -b .joomla
+#patch16 -p0 -b .joomla
 #%patch301 -p1 -b .getconf
 
 mkdir -p faq
@@ -229,10 +229,10 @@ CC=gcc CXX=g++ \
     --disable-ident-lookups \
     --enable-default-hostsfile=/etc/hosts \
     --enable-auth \
-    --enable-basic-auth="getpwnam,LDAP,MSNT,multi-domain-NTLM,NCSA,PAM,SMB,YP,SASL,POP3,DB,squid_radius_auth" \
-    --enable-ntlm-auth="fakeauth,no_check,smb_lm" \
-    --enable-negotiate-auth="squid_kerb_auth" \
-    --enable-digest-auth="password,ldap,eDirectory" \
+    --enable-auth-basic="DB,fake,getpwnam,LDAP,MSNT-multi-domain,NCSA,NIS,PAM,POP3,RADIUS,SASL,SMB" \
+    --enable-auth-ntlm="fake,smb_lm" \
+    --enable-auth-negotiate="kerberos,wrapper" \
+    --enable-auth-digest="file,LDAP,eDirectory" \
     --enable-external-acl-helpers \
     --with-default-user=%{name} \
     --with-pthreads \
@@ -313,13 +313,8 @@ install -m0755 squid.init %{buildroot}%{_initrddir}/squid
 install -m0644 squid.logrotate %{buildroot}/etc/logrotate.d/squid
 install -m0644 squid.sysconfig %{buildroot}/etc/sysconfig/squid
 install -m0755 squid.ifup %{buildroot}/etc/sysconfig/network-scripts/ifup.d/squid
-install -m0644 helpers/basic_auth/MSNT/msntauth.conf.default %{buildroot}%{_sysconfdir}
 
 # fix docs
-cp helpers/basic_auth/LDAP/README README.auth_ldap
-
-cp helpers/basic_auth/MSNT/README.html README.auth_msnt.html
-cp helpers/basic_auth/MSNT/msntauth.conf.default .
 
 cp helpers/basic_auth/SASL/basic_sasl_auth.conf .
 
@@ -510,7 +505,6 @@ fi
 %attr(0755,root,squid) %{_libexecdir}/digest_file_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_fake_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_getpwnam_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_msnt_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_ncsa_auth
 #%attr(0755,root,squid) %{_libexecdir}/ntlm_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_pam_auth
@@ -522,6 +516,7 @@ fi
 %attr(0755,root,squid) %{_libexecdir}/basic_db_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_ldap_auth
 %attr(0755,root,squid) %{_libexecdir}/basic_radius_auth
+%attr(0755,root,squid) %{_libexecdir}/ext_delayer_acl
 %attr(0755,root,squid) %{_libexecdir}/ext_session_acl
 %attr(0755,root,squid) %{_libexecdir}/ext_unix_group_acl
 %attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth
