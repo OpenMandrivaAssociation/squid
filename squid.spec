@@ -1,4 +1,5 @@
 #% define with test 0
+%define _disable_rebuild_configure 1
 
 # commandline overrides:
 # rpm -ba|--rebuild --with 'xxx'
@@ -7,7 +8,7 @@
 %define squid_date 20130108
 %define squid_beta 0
 ##%define their_version 3.2.1.%{squid_beta}-%{squid_date}
-%define their_version 3.5.1
+%define their_version 3.5.12
 
 ## Redefine configure values.
 %define	_bindir %{_prefix}/sbin
@@ -51,7 +52,6 @@ Patch2:		squid-user_group.diff
 Patch3:		squid-ssl.diff
 #Patch4:		squid-3.0-with_new_linux_headers_capability.patch
 Patch8:		squid-visible_hostname.diff
-Patch9:		squid-smb-auth.diff
 Patch11:	squid-shutdown_lifetime.diff
 #Patch12:	squid-no_-Werror.diff
 Patch13:	squid-datadir.diff
@@ -141,7 +141,6 @@ done
 %patch3 -p1 -b .ssl
 #patch4 -p0 -b .with_new_linux_headers_capability
 %patch8 -p1 -b .visible_hostname
-%patch9 -p1 -b .backslashes
 %patch11 -p0 -b .shutdown_lifetime
 #patch12 -p1 -b .no_-Werror
 %patch13 -p1 -b .datadir
@@ -500,6 +499,7 @@ fi
 %{_sysconfdir}/errors
 %{_datadir}/errors
 %{_datadir}/icons
+%{_datadir}/digest_edirectory_auth
 %{_libexecdir}/diskd
 %{_libexecdir}/unlinkd
 %attr(0755,root,squid) %{_libexecdir}/digest_ldap_auth
