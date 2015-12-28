@@ -499,7 +499,7 @@ fi
 %{_sysconfdir}/errors
 %{_datadir}/errors
 %{_datadir}/icons
-%{_datadir}/digest_edirectory_auth
+%attr(0755,root,squid) %{_libexecdir}/digest_edirectory_auth
 %{_libexecdir}/diskd
 %{_libexecdir}/unlinkd
 %attr(0755,root,squid) %{_libexecdir}/digest_ldap_auth
