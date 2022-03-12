@@ -68,7 +68,7 @@ BuildRequires:	libtool-devel
 BuildRequires:	db-devel
 BuildRequires:	sasl-devel
 BuildRequires:	openldap-devel
-BuildRequires:	openssl-devel >= 0.9.7
+BuildRequires:	openssl
 BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	libtool
