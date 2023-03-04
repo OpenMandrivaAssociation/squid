@@ -62,6 +62,7 @@ BuildRequires: gcc-c++
 BuildRequires: libtool libltdl-devel
 BuildRequires: atomic-devel
 BuildRequires: pkgconfig(libsasl2)
+BuildRequires: pkgconfig(gnutls)
 BuildRequires: perl-generators
 # For test suite
 BuildRequires: pkgconfig(cppunit)
