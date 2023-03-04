@@ -60,6 +60,7 @@ BuildRequires: pkgconfig(libecap)
 #ip_user helper requires
 BuildRequires: gcc-c++
 BuildRequires: libtool libltdl-devel
+BuildRequires: atomic-devel
 BuildRequires: perl-generators
 # For test suite
 BuildRequires: pkgconfig(cppunit)
