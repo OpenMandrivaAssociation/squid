@@ -54,7 +54,7 @@ BuildRequires: pkgconfig(tdb)
 # ESI support requires Expat & libxml2
 BuildRequires: expat-devel libxml2-devel
 # TPROXY requires libcap, and also increases security somewhat
-BuildRequires: libcap-devel
+BuildRequires: pkgconfig(libcap)
 # eCAP support
 BuildRequires: pkgconfig(libecap)
 #ip_user helper requires
