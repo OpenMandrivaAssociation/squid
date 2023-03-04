@@ -1,377 +1,279 @@
-#% define with test 0
-%define _disable_rebuild_configure 1
+%define __perl_requires %{SOURCE98}
 
-# commandline overrides:
-# rpm -ba|--rebuild --with 'xxx'
-%bcond_with test
+Name:     squid
+Version:  5.8
+Release:  1
+Summary:  The Squid proxy caching server
+# See CREDITS for breakdown of non GPLv2+ code
+License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
+URL:      http://www.squid-cache.org
 
-%define squid_date 20130108
-%define squid_beta 0
-##%define their_version 3.2.1.%{squid_beta}-%{squid_date}
-%define their_version 3.5.22
+Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
+Source1:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz.asc
+Source2:  http://www.squid-cache.org/pgp.asc
+Source3:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.logrotate
+Source4:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysconfig
+Source5:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.pam
+Source6:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.nm
+Source7:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.service
+Source8:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/cache_swap.sh
+Source9:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysusers
 
-## Redefine configure values.
-%define	_bindir %{_prefix}/sbin
-%define _libexecdir %{_libdir}/squid
-%define _initrddir /etc/rc.d/init.d/
-%define _sysconfdir /etc/squid
-%define  _localstatedir /var
-%define _datadir %{_usr}/share/squid
-%define _mandir %{_usr}/share/man
-%define _infodir %{_usr}/share/info
+Source98: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/perl-requires-squid.sh
 
-%define major %(echo %{their_version} |cut -d. -f1)
-%define majorminor %(echo %{their_version} |cut -d. -f1-2)
+# Upstream patches
 
-%define defaultmaxfiles 8192
+# Backported patches
+Patch101: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-5.7-ip-bind-address-no-port.patch
 
-Summary:	The Squid proxy caching server
-Name:		squid
-Version:	%{their_version}
-Release:	3
-License:	GPLv2
-Group:		System/Servers
-URL:		http://www.squid-cache.org/
-Source0:	http://www.squid-cache.org/Versions/v%{major}/%{majorminor}/squid-%{their_version}.tar.xz
-Source1:	http://www.squid-cache.org/Versions/v%{major}/%{majorminor}/squid-%{their_version}.tar.xz.asc
-Source2:	http://www.squid-cache.org/Doc/FAQ/FAQ.tar.bz2
-Source3:	squid.init
-Source4:	squid.logrotate
-Source5:	squid.conf.authenticate
-Source6:	smb.conf
-Source7:	squid.conf.transparent
-Source8:	rc.firewall
-Source9:	ERR_CUSTOM_ACCESS_DENIED.English
-Source10:	ERR_CUSTOM_ACCESS_DENIED.French
-Source11: 	squid.sysconfig
-Source12:	squid.pam-0.77
-Source13:	squid.pam
-Source14:	squid.ifup
-Patch1:		squid-config.diff
-Patch2:		squid-user_group.diff
-Patch3:		squid-ssl.diff
-#Patch4:		squid-3.0-with_new_linux_headers_capability.patch
-Patch8:		squid-visible_hostname.diff
-Patch11:	squid-shutdown_lifetime.diff
-#Patch12:	squid-no_-Werror.diff
-Patch13:	squid-datadir.diff
-#Patch14:	squid-digest-rfc2069.diff
-#Patch15:	squid-3.1-error-make.diff
-Patch16:	squid-3.1.4-mysql-helper-joomla.diff
-Patch301:	squid-getconf_mess.diff
-Requires(post): rpm-helper
-Requires(preun): rpm-helper
-Requires(pre): rpm-helper
-Requires(postun): rpm-helper
-BuildRequires:	bzip2
-BuildRequires:	libtool-devel
-BuildRequires:	db-devel
-BuildRequires:	sasl-devel
-BuildRequires:	openldap-devel
-BuildRequires:	openssl
-BuildRequires:	pam-devel
-BuildRequires:	pkgconfig
-BuildRequires:	libtool
-BuildRequires:	krb5-devel
-BuildRequires:	ecap-devel
-BuildRequires:	cap-devel
-BuildRequires:	pkgconfig(libtirpc)
-#BuildRequires:	automake1.9
-#BuildRequires:	autoconf2.5
-%if %{with test}
-BuildRequires:	cppunit-devel
-%endif
-Provides:	webproxy
+# Fedora patches
+# Applying upstream patches first makes it less likely that local patches
+# will break upstream ones.
+Patch201: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-4.0.11-config.patch
+Patch202: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.1.0.9-location.patch
+Patch203: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.0.STABLE1-perlpath.patch
+Patch204: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.5.9-include-guards.patch
+# revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
+# workaround for #1934919
+Patch205: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-5.0.5-symlink-lang-err.patch
+
+# cache_swap.sh
+Requires: bash gawk
+
+# squid_ldap_auth and other LDAP helpers require OpenLDAP
+BuildRequires: make
+BuildRequires: openldap-devel
+# squid_pam_auth requires PAM development libs
+BuildRequires: pam-devel
+# SSL support requires OpenSSL
+BuildRequires: pkgconfig(openssl)
+# squid_kerb_aut requires Kerberos development libs
+BuildRequires: krb5-devel
+# time_quota requires TrivialDB
+BuildRequires: pkgconfig(tdb)
+# ESI support requires Expat & libxml2
+BuildRequires: expat-devel libxml2-devel
+# TPROXY requires libcap, and also increases security somewhat
+BuildRequires: libcap-devel
+# eCAP support
+BuildRequires: pkgconfig(libecap)
+#ip_user helper requires
+BuildRequires: gcc-c++
+BuildRequires: libtool libltdl-devel
+BuildRequires: perl-generators
+# For test suite
+BuildRequires: pkgconfig(cppunit)
+# For verifying downloded src tarball
+BuildRequires: gnupg2
+# for _tmpfilesdir and _unitdir macro
+# see https://docs.fedoraproject.org/en-US/packaging-guidelines/Systemd/#_packaging
+BuildRequires: systemd-rpm-macros
+# systemd notify
+BuildRequires: pkgconfig(systemd)
+
+%{?systemd_requires}
+%{?sysusers_requires_compat}
+
+# Old NetworkManager expects the dispatcher scripts in a different place
+Conflicts: NetworkManager < 1.20
 
 %description
-Squid is a high-performance proxy caching server for web clients, supporting 
-FTP, gopher, and HTTP data objects over IPv4 or IPv6. Unlike traditional 
-caching software, Squid handles all requests in a single, non-blocking, 
-asynchronous process.
-Squid keeps meta data and especially hot objects cached in RAM, caches DNS 
-lookups, supports non-blocking DNS lookups, and implements negative caching 
-of failed requests.  Squid supports SSL, extensive access controls, and full 
-request logging. By using the lightweight Internet Cache Protocol (ICP) and 
-HTTP Cache Protocol (HTCP) Squid caches can be arranged in a hierarchy or 
-mesh for additional bandwidth savings.
+Squid is a high-performance proxy caching server for Web clients,
+supporting FTP, gopher, and HTTP data objects. Unlike traditional
+caching software, Squid handles all requests in a single,
+non-blocking, I/O-driven process. Squid keeps meta data and especially
+hot objects cached in RAM, caches DNS lookups, supports non-blocking
+DNS lookups, and implements negative caching of failed requests.
 
-Install squid if you need a proxy caching server.
-
-This package defaults to a maximum of %{defaultmaxfiles} filedescriptors. You
-can change these values at build time by using for example:
-
---define 'maxfiles 4096'
-
-The package was built to support a maximum of %{?!maxfiles:%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}} filedescriptors.
-
-You can build %{name} with some conditional build swithes;
-
-(ie. use with rpm --rebuild):
-    --with[out]	test	Initiate the test suite
-
-%package	cachemgr
-Summary:	The Squid Cache Manager
-Group:		System/Servers
-Requires(pre): rpm-helper
-Requires(postun): rpm-helper
-Requires(pre):	apache >= 2.0.54
-Requires(pre):	%{name} = %{version}
-Requires:	apache >= 2.0.54
-Requires:	%{name} = %{version}
-
-%description	cachemgr
-This package contains the Squid Cache Manager.
-
+Squid consists of a main server program squid, a Domain Name System
+lookup program (dnsserver), a program for retrieving FTP data
+(ftpget), and some management and client tools.
 
 %prep
+%setup -q
 
-%setup -q -n squid-%{their_version}
+# Upstream patches
 
-find . -type d -perm 0700 -exec chmod 755 {} \;
-find . -type f -perm 0555 -exec chmod 755 {} \;
-find . -type f -perm 0444 -exec chmod 644 {} \;
+# Backported patches
+%patch101 -p1 -b .ip-bind-address-no-port
 
-for i in `find . -type d -name CVS`  `find . -type d -name .svn` `find . -type f -name .cvs\*` `find . -type f -name .#\*`; do
-    if [ -e "$i" ]; then rm -rf $i; fi >&/dev/null
-done
+# Local patches
+%patch201 -p1 -b .config
+%patch202 -p1 -b .location
+%patch203 -p1 -b .perlpath
+%patch204 -p0 -b .include-guards
+%patch205 -p1 -R -b .symlink-lang-err
 
-
-%patch1 -p1 -b .config
-%patch2 -p1 -b .user_group
-%patch3 -p1 -b .ssl
-#patch4 -p0 -b .with_new_linux_headers_capability
-%patch8 -p1 -b .visible_hostname
-%patch11 -p0 -b .shutdown_lifetime
-#patch12 -p1 -b .no_-Werror
-%patch13 -p1 -b .datadir
-#patch14 -p1 -b .digest-rfc2069
-#patch15 -p1 -b .errordir
-#patch16 -p0 -b .joomla
-#%patch301 -p1 -b .getconf
-
-mkdir -p faq
-tar -jxf %{SOURCE2} -C faq
-
-install -m 0755 %{SOURCE3} squid.init
-install -m 0644 %{SOURCE4} squid.logrotate
-install -m 0644 %{SOURCE5} squid.conf.authenticate
-install -m 0644 %{SOURCE6} smb.conf
-install -m 0644 %{SOURCE7} squid.conf.transparent
-install -m 0755 %{SOURCE8} rc.firewall
-install -m 0644 %{SOURCE11} squid.sysconfig
-install -m 0755 %{SOURCE14} squid.ifup
-
-# fix conditional pam config file
-install -m 0644 %{SOURCE13} squid.pam
-
-perl -p -i -e "s|^SAMBAPREFIX.*|SAMBAPREFIX = /usr|" helpers/basic_auth/SMB/Makefile.*
-#perl -p -i -e "s|^icondir.*|icondir = \\$\(libexecdir\)/icons|" icons/Makefile.am icons/Makefile.*
-grep -r "local/bin/perl" . |sed -e "s/:.*$//g" | xargs perl -p -i -e "s@local/bin/perl@bin/perl@g"
-
-# libtool
-perl -pi -e "s|AC_PROG_RANLIB|AC_PROG_LIBTOOL|g" configure*
+# https://bugzilla.redhat.com/show_bug.cgi?id=1679526
+# Patch in the vendor documentation and used different location for documentation
+sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
 %build
 
-%serverbuild
-rm -rf configure autom4te.cache
-#libtoolize --copy --force
-#aclocal
-#autoheader
-#autoconf --force
-#automake --foreign --add-missing --copy --force-missing
+# NIS helper has been removed because of the following bug
+# https://bugzilla.redhat.com/show_bug.cgi?id=1531540
+%configure \
+   --libexecdir=%{_libdir}/squid \
+   --datadir=%{_datadir}/squid \
+   --sysconfdir=%{_sysconfdir}/squid \
+   --with-logdir='%{_localstatedir}/log/squid' \
+   --with-pidfile='/run/squid.pid' \
+   --disable-dependency-tracking \
+   --enable-eui \
+   --enable-follow-x-forwarded-for \
+   --enable-auth \
+   --enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB,SMB_LM" \
+   --enable-auth-ntlm="SMB_LM,fake" \
+   --enable-auth-digest="file,LDAP" \
+   --enable-auth-negotiate="kerberos" \
+   --enable-external-acl-helpers="LDAP_group,time_quota,session,unix_group,wbinfo_group,kerberos_ldap_group" \
+   --enable-storeid-rewrite-helpers="file" \
+   --enable-cache-digests \
+   --enable-cachemgr-hostname=localhost \
+   --enable-delay-pools \
+   --enable-epoll \
+   --enable-icap-client \
+   --enable-ident-lookups \
+   %ifnarch %{power64} ia64 x86_64 s390x aarch64
+   --with-large-files \
+   %endif
+   --enable-linux-netfilter \
+   --enable-removal-policies="heap,lru" \
+   --enable-snmp \
+   --enable-ssl \
+   --enable-ssl-crtd \
+   --enable-storeio="aufs,diskd,ufs,rock" \
+   --enable-diskio \
+   --enable-wccpv2 \
+   --enable-esi \
+   --enable-ecap \
+   --with-aio \
+   --with-default-user="squid" \
+   --with-dl \
+   --with-openssl \
+   --with-pthreads \
+   --disable-arch-native \
+   --disable-security-cert-validators \
+   --disable-strict-error-checking \
+   --with-swapdir=%{_localstatedir}/spool/squid
 
-sh ./bootstrap.sh
+rm libltdl/config-h.in
+cp -f /usr/share/libtool/config-h.in libltdl/
 
-export SSLLIB="-L%{_libdir} `pkg-config --libs openssl`"
-export CPPFLAGS="-I%{_includedir}/openssl -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` %optflags "
+# workaround to build squid v5
+mkdir -p src/icmp/tests
+mkdir -p tools/squidclient/tests
+mkdir -p tools/tests
 
-%ifarch x86_64
-export CFLAGS="$CFLAGS -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
-export CXXFLAGS="$CXXFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
-%else
-export CFLAGS="$CFLAGS -I`find /usr/include -type f -name db_185.h|head -n1|xargs dirname` -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-export CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-%endif
+%make_build
 
-# --enable-external-acl-helpers="ip_user,ldap_group,session,unix_group,wbinfo_group" \
-CC=gcc CXX=g++ \
-%configure2_5x \
-    --disable-strict-error-checking \
-    --enable-shared=yes \
-    --enable-static=no \
-    --enable-xmalloc-statistics \
-    --enable-carp \
-    --enable-async-io \
-    --enable-storeio="aufs,diskd,ufs" \
-    --enable-removal-policies="heap,lru" \
-    --enable-icmp \
-    --enable-delay-pools \
-    --disable-esi \
-    --enable-icap-client \
-    --enable-ecap \
-    --enable-useragent-log \
-    --enable-referer-log \
-    --enable-wccp \
-    --enable-wccpv2 \
-    --disable-kill-parent-hack \
-    --enable-snmp \
-    --enable-cachemgr-hostname="localhost" \
-    --enable-arp-acl \
-    --enable-htcp \
-    --enable-ssl \
-    --enable-forw-via-db \
-    --enable-follow-x-forwarded-for \
-    --enable-cache-digests \
-    --disable-poll \
-    --enable-epoll \
-    --enable-linux-netfilter \
-    --disable-ident-lookups \
-    --enable-default-hostsfile=/etc/hosts \
-    --enable-auth \
-    --enable-auth-basic="DB,fake,getpwnam,LDAP,MSNT-multi-domain,NCSA,NIS,PAM,POP3,RADIUS,SASL,SMB" \
-    --enable-auth-ntlm="fake,smb_lm" \
-    --enable-auth-negotiate="kerberos,wrapper" \
-    --enable-auth-digest="file,LDAP,eDirectory" \
-    --enable-external-acl-helpers \
-    --with-default-user=%{name} \
-    --with-pthreads \
-    --with-dl \
-    --with-openssl=%{_prefix} \
-    --with-large-files \
-    --with-swapdir=%{_localstatedir}/spool/squid \
-    --with-build-environment=default \
-    --enable-mit=`/usr/bin/krb5-config --prefix` \
-    --with-logdir=%{_logdir}/squid \
-    --enable-http-violations \
-    --enable-zph-qos \
-    %{?!maxfiles:--with-filedescriptors=%{defaultmaxfiles}}%{?maxfiles:%{maxfiles}}
-
-
-#    --enable-disk-io="AIO,Blocking,DiskDaemon,DiskThreads" \
-
-# Some versions of autoconf fail to detect sys/resource.h correctly;
-# apparently because it generates a compiler warning.
-
-if [ -e /usr/include/sys/resource.h ]; then
-cat >> include/autoconf.h <<EOF
-#ifndef HAVE_SYS_RESOURCE_H
-#define HAVE_SYS_RESOURCE_H 1
-#define HAVE_STRUCT_RUSAGE 1
-#endif
-EOF
-fi
-
-# move the errors files
-#grep -r errors * |grep share | sed -e "s/:.*$//g" | xargs perl -p -i -e "s|usr/share/errors|usr/%{_lib}/squid/errors|g" 
-#grep -r iconsdir * |grep share | sed -e "s/:.*$//g" | xargs perl -p -i -e "s|usr/share/errors|usr/%{_lib}/squid/errors|g" 
-
-%make
-
-#grep -r errors * |grep share | sed -e "s/:.*$//g" | xargs perl -p -i -e "s|usr/share/errors|usr/%{_lib}/squid/errors|g" 
-
-%if %{with test}
 %check
-make check
-%endif
+#make check
 
 %install
-rm -rf %{buildroot}
+%make_install
 
-%makeinstall icondir=%{buildroot}%{_datadir}/icons DEFAULT_LOG_DIR=%{buildroot}%{_logdir}/squid DEFAULT_ERROR_DIR=%{buildroot}%{_datadir}/errors DEFAULT_ICON_DIR=%{buildroot}%{_datadir}/icons
+echo "
+#
+# This is %{_sysconfdir}/httpd/conf.d/squid.conf
+#
+
+ScriptAlias /Squid/cgi-bin/cachemgr.cgi %{_libdir}/squid/cachemgr.cgi
+
+# Only allow access from localhost by default
+<Location /Squid/cgi-bin/cachemgr.cgi>
+ Require local
+ # Add additional allowed hosts as needed
+ # Require host example.com
+</Location>" > $RPM_BUILD_ROOT/squid.httpd.tmp
 
 
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pam.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
+mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/squid
+install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/squid
+install -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/squid
+install -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/squid
+install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_unitdir}
+install -m 755 %{SOURCE8} $RPM_BUILD_ROOT%{_libexecdir}/squid
+install -m 644 $RPM_BUILD_ROOT/squid.httpd.tmp $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/squid.conf
+install -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d/20-squid
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/squid
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/spool/squid
+mkdir -p $RPM_BUILD_ROOT/run/squid
+chmod 644 contrib/url-normalizer.pl contrib/user-agents.pl
 
-# make some directories
-install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}/etc/{logrotate.d,pam.d,sysconfig}
-install -d %{buildroot}/etc/sysconfig/network-scripts/ifup.d
-install -d %{buildroot}/etc/httpd/conf/webapps.d
-install -d %{buildroot}%{_datadir}/{errors,icons}
-install -d %{buildroot}%{_datadir}/errors/{English,French}
-install -d %{buildroot}%{_mandir}/man8
-install -d %{buildroot}%{_var}/www/cgi-bin
-install -d %{buildroot}%{_var}/log/squid
-#install -d %{buildroot}%{_var}/run/squid
-install -d %{buildroot}%{_var}/spool/squid
-install -d %{buildroot}/usr/share/snmp/mibs
+# install /usr/lib/tmpfiles.d/squid.conf
+mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
+cat > ${RPM_BUILD_ROOT}%{_tmpfilesdir}/squid.conf <<EOF
+# See tmpfiles.d(5) for details
 
-# fix error docs location	
-rm -rf %{buildroot}%{_sysconfdir}/errors
-pushd errors
-    for i in *; do
-	if [ -d $i ]; then
-	    install -d %{buildroot}%{_datadir}/errors/$i
-	    install -m0644 $i/* %{buildroot}%{_datadir}/errors/$i
-	fi
-    done
-popd
-ln -fs %{_datadir}/errors/templates %{buildroot}%{_sysconfdir}/errors
-
-# install config
-install -m0755 squid.init %{buildroot}%{_initrddir}/squid
-install -m0644 squid.logrotate %{buildroot}/etc/logrotate.d/squid
-install -m0644 squid.sysconfig %{buildroot}/etc/sysconfig/squid
-install -m0755 squid.ifup %{buildroot}/etc/sysconfig/network-scripts/ifup.d/squid
-
-# fix docs
-
-cp helpers/basic_auth/SASL/basic_sasl_auth.conf .
-
-cp helpers/external_acl/file_userip/example.conf ip_user_external_acl.example.conf
-cp helpers/external_acl/file_userip/example-deny_all_but.conf ip_user_external_acl.example-deny_all_but.conf
-
-cp helpers/external_acl/LDAP_group/ChangeLog ChangeLog.ldap_group_external_acl
-
-head -19 helpers/basic_auth/NCSA/basic_ncsa_auth.cc > README.NCSA_basic_auth
-head -56 helpers/basic_auth/PAM/basic_pam_auth.cc > README.PAM_basic_auth
-head -21 helpers/basic_auth/getpwnam/basic_getpwnam_auth.cc > README.getpwnam_basic_auth
-head -32 helpers/digest_auth/LDAP/digest_pw_auth.cc > README.ldap_digest_auth
-
-install -m0755 helpers/basic_auth/SMB/basic_smb_auth.sh %{buildroot}%{_libexecdir}
-install -m0755 helpers/basic_auth/SASL/basic_sasl_auth %{buildroot}%{_libexecdir}
-
-for manpage in `find -name "*.8"`; do
-    install -m0644 $manpage %{buildroot}/%{_mandir}/man8/
-done
-
-install -m 0644 %{SOURCE9} %{buildroot}%{_datadir}/errors/English/ERR_CUSTOM_ACCESS_DENIED
-install -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/errors/French/ERR_CUSTOM_ACCESS_DENIED
-
-install -m644 squid.pam %{buildroot}/etc/pam.d/squid
-
-# move the mib in-place
-mv %{buildroot}%{_datadir}/mib.txt %{buildroot}/usr/share/snmp/mibs/SQUID.txt
-
-# move cachemgr.cgi to a more safe location
-mv %{buildroot}%{_libexecdir}/cachemgr.cgi %{buildroot}%{_var}/www/cgi-bin/
-
-# provide a simple apache config
-cat > %{buildroot}/etc/httpd/conf/webapps.d/squid-cachemgr.conf << EOF
-<Location /cgi-bin/cachemgr.cgi>
-%if %{mdvver} < 2013
-    Order deny,allow
-    Deny from all
-    Allow from 127.0.0.1
-%endif
-%if %{mdvver} >= 2013
-    Require local granted
-%endif
-    ErrorDocument 403 "Access denied per /etc/httpd/conf/webapps.d/squid-cachemgr.conf"
-</Location>
+d /run/squid 0755 squid squid - -
 EOF
 
-# some cleaning
-rm -f %{buildroot}%{_libdir}/squid/no_check.pl
-#rm -rf %{buildroot}%{_datadir}/errors
+# Move the MIB definition to the proper place (and name)
+mkdir -p $RPM_BUILD_ROOT/usr/share/snmp/mibs
+mv $RPM_BUILD_ROOT/usr/share/squid/mib.txt $RPM_BUILD_ROOT/usr/share/snmp/mibs/SQUID-MIB.txt
 
-# nuke zero length files
-find %{buildroot}%{_datadir}/errors/ -type f -size 0 -exec rm -f {} \;
+# squid.conf.documented is documentation. We ship that in doc/
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/squid/squid.conf.documented
+
+# remove unpackaged files from the buildroot
+rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
+
+# sysusers.d
+install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
+
+%files
+%license COPYING 
+%doc CONTRIBUTORS README ChangeLog QUICKSTART src/squid.conf.documented
+%doc contrib/url-normalizer.pl contrib/user-agents.pl
+
+%{_unitdir}/squid.service
+%attr(755,root,root) %dir %{_libexecdir}/squid
+%attr(755,root,root) %{_libexecdir}/squid/cache_swap.sh
+%attr(755,root,root) %dir %{_sysconfdir}/squid
+%attr(755,root,root) %dir %{_libdir}/squid
+%attr(770,squid,root) %dir %{_localstatedir}/log/squid
+%attr(750,squid,squid) %dir %{_localstatedir}/spool/squid
+%attr(755,squid,squid) %dir /run/squid
+
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.d/squid.conf
+%config(noreplace) %attr(640,root,squid) %{_sysconfdir}/squid/squid.conf
+%config(noreplace) %attr(644,root,squid) %{_sysconfdir}/squid/cachemgr.conf
+%config(noreplace) %{_sysconfdir}/squid/mime.conf
+%config(noreplace) %{_sysconfdir}/squid/errorpage.css
+%config(noreplace) %{_sysconfdir}/sysconfig/squid
+# These are not noreplace because they are just sample config files
+%config %{_sysconfdir}/squid/squid.conf.default
+%config %{_sysconfdir}/squid/mime.conf.default
+%config %{_sysconfdir}/squid/errorpage.css.default
+%config %{_sysconfdir}/squid/cachemgr.conf.default
+%config(noreplace) %{_sysconfdir}/pam.d/squid
+%config(noreplace) %{_sysconfdir}/logrotate.d/squid
+
+%dir %{_datadir}/squid
+%attr(-,root,root) %{_datadir}/squid/errors
+%{_prefix}/lib/NetworkManager
+%{_datadir}/squid/icons
+%{_sbindir}/squid
+%{_bindir}/squidclient
+%{_bindir}/purge
+%{_mandir}/man8/*
+%{_mandir}/man1/*
+%{_libdir}/squid/*
+%{_datadir}/snmp/mibs/SQUID-MIB.txt
+%{_tmpfilesdir}/squid.conf
+%{_sysusersdir}/squid.conf
 
 %pre
-%_pre_useradd squid %{_var}/spool/squid /bin/false
+%sysusers_create_compat %{SOURCE9}
 
-for i in %{_var}/log/squid %{_var}/spool/squid ; do
+for i in /var/log/squid /var/spool/squid ; do
         if [ -d $i ] ; then
                 for adir in `find $i -maxdepth 0 \! -user squid`; do
                         chown -R squid:squid $adir
@@ -379,180 +281,51 @@ for i in %{_var}/log/squid %{_var}/spool/squid ; do
         fi
 done
 
-%post
-%_create_ssl_certificate squid
+exit 0
 
-%_post_service squid
- case "$LANG" in
-  az*)
-     DIR=Azerbaijani
-     ;;
-  bg*)
-     DIR=Bulgarian
-     ;;
-  ca*)
-     DIR=Catalan
-     ;;
-  cs*)
-     DIR=Czech
-     ;;
-  da*)
-     DIR=Danish
-     ;;
-  nl*)
-     DIR=Dutch
-     ;;
-  en*)
-     DIR=English
-     ;;
-  ea*)
-     DIR=Estonian
-     ;;
-  fi*)
-     DIR=Finnish
-     ;;
-  fr*)
-     DIR=French
-     ;;
-  de*)
-     DIR=German
-     ;;
-  el*)
-     DIR=Greek
-     ;;
-  he*)
-     DIR=Hebrew
-     ;;
-  hu*)
-     DIR=Hungarian
-     ;;
-  it*)
-     DIR=Italian
-     ;;
-  ja*)
-     DIR=Japanese
-     ;;
-  kr*)
-     DIR=Korean
-     ;;
-  lt*)
-     DIR=Lithuanian
-     ;;
-  pl*)
-     DIR=Polish
-     ;;
-  pt*)
-     DIR=Portuguese
-     ;;
-  ro*)
-     DIR=Romanian
-     ;;
-  ru*)
-     DIR=Russian-koi8-r
-     ;;
-  sr*)
-     DIR=Serbian
-     ;;
-  sk*)
-     DIR=Slovak
-     ;;
-  es*)
-     DIR=Spanish
-     ;;
-  sv*)
-     DIR=Swedish
-     ;;
-  zh*)
-     DIR=Traditional_Chinese
-     ;;
-  tr*)
-     DIR=Turkish
-     ;;
-  *)
-     DIR=English
-     ;;
- esac
+%pretrans -p <lua>
+-- temporarilly commented until https://bugzilla.redhat.com/show_bug.cgi?id=1936422 is resolved
+--
+-- previously /usr/share/squid/errors/es-mx was symlink, now it is directory since squid v5
+-- see https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement/
+-- Define the path to the symlink being replaced below.
+--
+-- path = "/usr/share/squid/errors/es-mx"
+-- st = posix.stat(path)
+-- if st and st.type == "link" then
+--   os.remove(path)
+-- end
+
+-- Due to a bug #447156
+paths = {"/usr/share/squid/errors/zh-cn", "/usr/share/squid/errors/zh-tw"}
+for key,path in ipairs(paths)
+do
+  st = posix.stat(path)
+  if st and st.type == "directory" then
+    status = os.rename(path, path .. ".rpmmoved")
+    if not status then
+      suffix = 0
+      while not status do
+        suffix = suffix + 1
+        status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
+      end
+      os.rename(path, path .. ".rpmmoved")
+    end
+  end
+end
+
+%post
+%systemd_post squid.service
 
 %preun
-%_preun_service squid
-if [ $1 = 0 ] ; then
-	rm -f %{_var}/log/squid/*
-        /sbin/chkconfig --del squid
-fi
+%systemd_preun squid.service
 
 %postun
-%_postun_userdel squid
+%systemd_postun_with_restart squid.service
 
-%files
-%doc faq/* C* R* Q* rc.firewall *.conf* doc/*.txt
-%exclude %{_sysconfdir}/cachemgr.conf
-%dir %_sysconfdir
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.conf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.default
-%attr(0644,root,root) %config(noreplace) /etc/pam.d/squid
-%attr(0644,root,root) %config(noreplace) /etc/sysconfig/squid
-%attr(0644,root,root) %config(noreplace) /etc/logrotate.d/squid
-%attr(0755,root,squid) %config(noreplace) /etc/sysconfig/network-scripts/ifup.d/squid
-%attr(0755,root,squid) %{_initrddir}/squid
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.css
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/*.documented
-%{_sysconfdir}/errors
-%{_datadir}/errors
-%{_datadir}/icons
-%attr(0755,root,squid) %{_libexecdir}/digest_edirectory_auth
-%{_libexecdir}/diskd
-%{_libexecdir}/unlinkd
-%attr(0755,root,squid) %{_libexecdir}/digest_ldap_auth
-%attr(0755,root,squid) %{_libexecdir}/digest_file_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_fake_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_getpwnam_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_ncsa_auth
-#%attr(0755,root,squid) %{_libexecdir}/ntlm_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_pam_auth
-%attr(4755,root,squid) %{_libexecdir}/pinger
-%attr(0755,root,squid) %{_libexecdir}/basic_pop3_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_sasl_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_smb_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_smb_auth.sh
-%attr(0755,root,squid) %{_libexecdir}/basic_db_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_ldap_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_radius_auth
-%attr(0755,root,squid) %{_libexecdir}/ext_delayer_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_session_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_unix_group_acl
-%attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth
-%attr(0755,root,squid) %{_libexecdir}/negotiate_kerberos_auth_test
-%attr(0755,root,squid) %{_libexecdir}/ntlm_smb_lm_auth
-%attr(0755,root,squid) %{_libexecdir}/basic_msnt_multi_domain_auth
-%attr(0755,root,squid) %{_libexecdir}/ext_wbinfo_group_acl
-%attr(0755,root,squid) %{_libexecdir}/helper-mux.pl
-%attr(0755,root,squid) %{_libexecdir}/log_file_daemon
-%attr(0755,root,squid) %{_libexecdir}/negotiate_wrapper_auth
-%attr(0755,root,squid) %{_libexecdir}/ntlm_fake_auth
-%attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite
-%attr(0755,root,squid) %{_libexecdir}/url_fake_rewrite.sh
-%attr(0755,root,squid) %{_libexecdir}/basic_nis_auth
-%attr(0755,root,squid) %{_libexecdir}/cert_tool
-%attr(0755,root,squid) %{_libexecdir}/cert_valid.pl
-%attr(0755,root,squid) %{_libexecdir}/ext_edirectory_userip_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_file_userip_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_kerberos_ldap_group_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_ldap_group_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_sql_session_acl
-%attr(0755,root,squid) %{_libexecdir}/ext_time_quota_acl
-%attr(0755,root,squid) %{_libexecdir}/log_db_daemon
-%attr(0755,root,squid) %{_libexecdir}/storeid_file_rewrite
-
-
-%{_sbindir}/*
-%attr(0644,root,root) %{_mandir}/man8/*
-%attr(0644,root,root) %{_mandir}/man1/*
-#%attr(0755,squid,squid) %dir %{_var}/run/squid
-%attr(0755,squid,squid) %dir %{_var}/log/squid
-%attr(0755,squid,squid) %dir %{_var}/spool/squid
-%attr(0644,root,squid) /usr/share/snmp/mibs/SQUID.txt
-
-%files cachemgr
-%attr(0644,root,root) %config(noreplace) /etc/httpd/conf/webapps.d/squid-cachemgr.conf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cachemgr.conf
-%attr(0755,root,squid) %{_var}/www/cgi-bin/cachemgr.cgi
+%triggerin -- samba-common
+if ! getent group wbpriv >/dev/null 2>&1 ; then
+  /usr/sbin/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
+fi
+/usr/sbin/usermod -a -G wbpriv squid >/dev/null 2>&1 || \
+    chgrp squid /var/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
