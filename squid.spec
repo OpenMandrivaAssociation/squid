@@ -61,6 +61,7 @@ BuildRequires: pkgconfig(libecap)
 BuildRequires: gcc-c++
 BuildRequires: libtool libltdl-devel
 BuildRequires: atomic-devel
+BuildRequires: pkgconfig(libsasl2)
 BuildRequires: perl-generators
 # For test suite
 BuildRequires: pkgconfig(cppunit)
