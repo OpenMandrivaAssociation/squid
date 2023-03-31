@@ -2,7 +2,7 @@
 
 Name:     squid
 Version:  5.8
-Release:  1
+Release:  2
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
