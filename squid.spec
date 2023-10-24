@@ -1,15 +1,15 @@
 %define __perl_requires %{SOURCE98}
 
 Name:     squid
-Version:  5.8
-Release:  2
+Version:  6.3
+Release:  1
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
 URL:      http://www.squid-cache.org
 
-Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz.asc
+Source0:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz
+Source1:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz.asc
 Source2:  http://www.squid-cache.org/pgp.asc
 Source3:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.logrotate
 Source4:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysconfig
@@ -24,7 +24,6 @@ Source98: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/perl-requires-s
 # Upstream patches
 
 # Backported patches
-Patch101: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-5.7-ip-bind-address-no-port.patch
 
 # Fedora patches
 # Applying upstream patches first makes it less likely that local patches
@@ -32,17 +31,13 @@ Patch101: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-5.7-ip-bi
 Patch201: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-4.0.11-config.patch
 Patch202: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.1.0.9-location.patch
 Patch203: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.0.STABLE1-perlpath.patch
-Patch204: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.5.9-include-guards.patch
-# revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
-# workaround for #1934919
-Patch205: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-5.0.5-symlink-lang-err.patch
 
 # cache_swap.sh
 Requires: bash gawk
 
 # squid_ldap_auth and other LDAP helpers require OpenLDAP
 BuildRequires: make
-BuildRequires: openldap-devel
+BuildRequires: pkgconfig(ldap)
 # squid_pam_auth requires PAM development libs
 BuildRequires: pam-devel
 # SSL support requires OpenSSL
@@ -98,14 +93,11 @@ lookup program (dnsserver), a program for retrieving FTP data
 # Upstream patches
 
 # Backported patches
-%patch101 -p1 -b .ip-bind-address-no-port
 
 # Local patches
 %patch201 -p1 -b .config
 %patch202 -p1 -b .location
 %patch203 -p1 -b .perlpath
-%patch204 -p0 -b .include-guards
-%patch205 -p1 -R -b .symlink-lang-err
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
