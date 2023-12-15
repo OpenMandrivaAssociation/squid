@@ -1,7 +1,7 @@
 %define __perl_requires %{SOURCE98}
 
 Name:     squid
-Version:  6.3
+Version:  6.6
 Release:  1
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code

@@ -1,3 +1,4 @@
 sources:
   FAQ.tar.bz2: 997f42cb83f3ed8d8c160c402dac4b43a11c11e8
-  squid-6.3.tar.xz: 7bd74034015c6a4d345a4d277a431908bed2ec4a
+  squid-6.6.tar.xz: f05e06a9dd3bf7501d2844e43d9ae1bd00e9edcc
+  squid-6.6.tar.xz.asc: a251df070911b05241e2c2103a97263d63cec7ae
