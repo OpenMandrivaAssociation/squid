@@ -6,7 +6,7 @@ Release:  1
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
-URL:      http://www.squid-cache.org
+URL:      https://www.squid-cache.org
 
 Source0:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz
 Source1:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz.asc
