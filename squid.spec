@@ -36,6 +36,10 @@ Patch203: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.0.STABL
 Requires: bash gawk
 
 # squid_ldap_auth and other LDAP helpers require OpenLDAP
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
 BuildRequires: make
 BuildRequires: pkgconfig(ldap)
 # squid_pam_auth requires PAM development libs
