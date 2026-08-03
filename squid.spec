@@ -1,15 +1,15 @@
 %define __perl_requires %{SOURCE98}
 
 Name:     squid
-Version:  6.7
-Release:  2
+Version:  7.6
+Release:  1
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
 URL:      https://www.squid-cache.org
 
-Source0:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz.asc
+Source0:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz
+Source1:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz.asc
 Source2:  http://www.squid-cache.org/pgp.asc
 Source3:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.logrotate
 Source4:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysconfig
@@ -99,9 +99,9 @@ lookup program (dnsserver), a program for retrieving FTP data
 # Backported patches
 
 # Local patches
-%patch201 -p1 -b .config
-%patch202 -p1 -b .location
-%patch203 -p1 -b .perlpath
+%patch -P 201 -p1 -b .config
+%patch -P 202 -p1 -b .location
+%patch -P 203 -p1 -b .perlpath
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
