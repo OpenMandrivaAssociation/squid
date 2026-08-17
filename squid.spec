@@ -60,6 +60,7 @@ BuildRequires: pkgconfig(libecap)
 #ip_user helper requires
 BuildRequires: gcc-c++
 BuildRequires: libtool libltdl-devel
+BuildRequires: pkgconfig(sltdl)
 BuildRequires: atomic-devel
 BuildRequires: pkgconfig(libsasl2)
 BuildRequires: pkgconfig(gnutls)
