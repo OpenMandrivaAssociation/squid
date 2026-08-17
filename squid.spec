@@ -110,6 +110,9 @@ lookup program (dnsserver), a program for retrieving FTP data
 sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
 %build
+# OpenSSL 4 getters return const; Squid 7.6 still stores them in mutable pointers
+export CXXFLAGS="${CXXFLAGS} -fpermissive"
+
 # NIS helper has been removed because of the following bug
 # https://bugzilla.redhat.com/show_bug.cgi?id=1531540
 %configure \
