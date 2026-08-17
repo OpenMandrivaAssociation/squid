@@ -2,7 +2,7 @@
 
 Name:     squid
 Version:  7.6
-Release:  1
+Release:  2
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
@@ -31,6 +31,7 @@ Source98: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/perl-requires-s
 Patch201: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-4.0.11-config.patch
 Patch202: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.1.0.9-location.patch
 Patch203: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid-3.0.STABLE1-perlpath.patch
+Patch204: squid-7.6-openssl4-asn1.patch
 
 # cache_swap.sh
 Requires: bash gawk
@@ -102,15 +103,13 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch -P 201 -p1 -b .config
 %patch -P 202 -p1 -b .location
 %patch -P 203 -p1 -b .perlpath
+%patch -P 204 -p1 -b .openssl4-asn1
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
 sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
 %build
-# OpenSSL 3 made ASN1_STRING opaque; Squid 7.6 still pokes internals
-export CPPFLAGS="-DOPENSSL_SUPPRESS_DEPRECATED ${CPPFLAGS}"
-
 # NIS helper has been removed because of the following bug
 # https://bugzilla.redhat.com/show_bug.cgi?id=1531540
 %configure \

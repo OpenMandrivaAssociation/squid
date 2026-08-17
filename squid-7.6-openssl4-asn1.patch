@@ -1,0 +1,169 @@
+OpenSSL 4 made ASN1_STRING opaque; use accessors instead of struct fields.
+
+--- a/src/ssl/gadgets.cc	2026-08-17 07:08:59.011686693 +0200
++++ b/src/ssl/gadgets.cc	2026-08-17 07:08:59.030430409 +0200
+@@ -301,9 +301,10 @@
+ printX509Signature(const Security::CertPointer &cert, std::string &out)
+ {
+     const ASN1_BIT_STRING *sig = Ssl::X509_get_signature(cert);
+-    if (sig && sig->data) {
+-        const unsigned char *s = sig->data;
+-        for (int i = 0; i < sig->length; ++i) {
++    const unsigned char *s = sig ? ASN1_STRING_get0_data(sig) : nullptr;
++    if (sig && s) {
++        const int slen = ASN1_STRING_length(sig);
++        for (int i = 0; i < slen; ++i) {
+             char hex[3];
+             snprintf(hex, sizeof(hex), "%02x", s[i]);
+             out.append(hex);
+@@ -418,8 +419,8 @@
+     unsigned char *ext_der = nullptr;
+     int ext_len = ASN1_item_i2d((ASN1_VALUE *)theAuthKeyId.get(), &ext_der, ASN1_ITEM_ptr(method->it));
+     Ssl::ASN1_OCTET_STRING_Pointer extOct(ASN1_OCTET_STRING_new());
+-    extOct.get()->data = ext_der;
+-    extOct.get()->length = ext_len;
++    ASN1_STRING_set(extOct.get(), ext_der, ext_len);
++    OPENSSL_free(ext_der);
+     Ssl::X509_EXTENSION_Pointer extAuthKeyId(X509_EXTENSION_create_by_NID(nullptr, NID_authority_key_identifier, 0, extOct.get()));
+     if (!extAuthKeyId.get())
+         return false;
+@@ -495,8 +496,8 @@
+                                                 (const ASN1_ITEM *)ASN1_ITEM_ptr(method->it));
+ 
+                     ASN1_OCTET_STRING *ext_oct = ASN1_OCTET_STRING_new();
+-                    ext_oct->data = ext_der;
+-                    ext_oct->length = ext_len;
++                    ASN1_STRING_set(ext_oct, ext_der, ext_len);
++                    OPENSSL_free(ext_der);
+                     X509_EXTENSION_set_data(ext, ext_oct);
+ 
+                     ASN1_OCTET_STRING_free(ext_oct);
+@@ -518,7 +519,8 @@
+ SBuf
+ Ssl::AsnToSBuf(const ASN1_STRING &buffer)
+ {
+-    return SBuf(reinterpret_cast<const char *>(buffer.data), buffer.length);
++    return SBuf(reinterpret_cast<const char *>(ASN1_STRING_get0_data(&buffer)),
++                ASN1_STRING_length(&buffer));
+ }
+ 
+ /// OpenSSL ASN1_STRING_to_UTF8() wrapper
+@@ -526,7 +528,8 @@
+ ParseAsUtf8(const ASN1_STRING &asnBuffer)
+ {
+     unsigned char *utfBuffer = nullptr;
+-    const auto conversionResult = ASN1_STRING_to_UTF8(&utfBuffer, &asnBuffer);
++    const auto conversionResult =
++        ASN1_STRING_to_UTF8(&utfBuffer, const_cast<ASN1_STRING *>(&asnBuffer));
+     if (conversionResult < 0) {
+         debugs(83, 3, "failed" << Ssl::ReportAndForgetErrors);
+         return std::nullopt;
+@@ -594,7 +597,8 @@
+     // https://github.com/openssl/openssl/issues/11706#issuecomment-633180151
+     const auto altNamePrefix = cn->ip() ? "IP:" : "DNS:";
+     auto altName = ToSBuf(altNamePrefix, *cn);
+-    const auto ext = X509V3_EXT_conf_nid(nullptr, nullptr, NID_subject_alt_name, altName.c_str());
++    const auto ext = X509V3_EXT_conf_nid(nullptr, nullptr, NID_subject_alt_name,
++                                         const_cast<char *>(altName.c_str()));
+     if (!ext)
+         return false;
+ 
+@@ -929,13 +933,16 @@
+ 
+ bool Ssl::sslDateIsInTheFuture(char const * date)
+ {
+-    ASN1_UTCTIME tm;
+-    tm.flags = 0;
+-    tm.type = 23;
+-    tm.data = (unsigned char *)date;
+-    tm.length = strlen(date);
+-
+-    return (X509_cmp_current_time(&tm) > 0);
++    ASN1_UTCTIME *tm = ASN1_UTCTIME_new();
++    if (!tm)
++        return false;
++    if (!ASN1_UTCTIME_set_string(tm, date)) {
++        ASN1_UTCTIME_free(tm);
++        return false;
++    }
++    const int cmp = X509_cmp_current_time(tm);
++    ASN1_UTCTIME_free(tm);
++    return cmp > 0;
+ }
+ 
+ /// Print the time represented by a ASN1_TIME struct to a string using GeneralizedTime format
+@@ -947,12 +954,14 @@
+ 
+     // length should have space for data plus 2 extra bytes for the two extra year fields
+     // plus the '\0' char.
+-    if ((aTime->length + 3) > bufLen)
++    const int tlen = ASN1_STRING_length(aTime);
++    const unsigned char *tdata = ASN1_STRING_get0_data(aTime);
++    if ((tlen + 3) > bufLen)
+         return false;
+ 
+     char *str;
+-    if (aTime->type == V_ASN1_UTCTIME) {
+-        if (aTime->data[0] > '5') { // RFC 2459, section 4.1.2.5.1
++    if (ASN1_STRING_type(aTime) == V_ASN1_UTCTIME) {
++        if (tdata[0] > '5') { // RFC 2459, section 4.1.2.5.1
+             buf[0] = '1';
+             buf[1] = '9';
+         } else {
+@@ -960,11 +969,11 @@
+             buf[1] = '0';
+         }
+         str = buf +2;
+-    } else // if (aTime->type == V_ASN1_GENERALIZEDTIME)
++    } else // if (ASN1_STRING_type(aTime) == V_ASN1_GENERALIZEDTIME)
+         str = buf;
+ 
+-    memcpy(str, aTime->data, aTime->length);
+-    str[aTime->length] = '\0';
++    memcpy(str, tdata, tlen);
++    str[tlen] = '\0';
+     return true;
+ }
+ 
+--- a/src/ssl/support.cc	2026-08-17 07:08:59.012698784 +0200
++++ b/src/ssl/support.cc	2026-08-17 07:08:59.030474310 +0200
+@@ -272,23 +272,24 @@
+ 
+         // RFC 5280 section 4.2.1.6 signals IPv4/IPv6 address family using data length
+ 
+-        if (san.d.iPAddress->length == 4) {
++        if (ASN1_STRING_length(san.d.iPAddress) == 4) {
+             struct in_addr addr;
+             static_assert(sizeof(addr.s_addr) == 4);
+-            memcpy(&addr.s_addr, san.d.iPAddress->data, sizeof(addr.s_addr));
++            memcpy(&addr.s_addr, ASN1_STRING_get0_data(san.d.iPAddress), sizeof(addr.s_addr));
+             const Ip::Address ip(addr);
+             return AnyP::Host::ParseIp(ip);
+         }
+ 
+-        if (san.d.iPAddress->length == 16) {
++        if (ASN1_STRING_length(san.d.iPAddress) == 16) {
+             struct in6_addr addr;
+             static_assert(sizeof(addr.s6_addr) == 16);
+-            memcpy(&addr.s6_addr, san.d.iPAddress->data, sizeof(addr.s6_addr));
++            memcpy(&addr.s6_addr, ASN1_STRING_get0_data(san.d.iPAddress), sizeof(addr.s6_addr));
+             const Ip::Address ip(addr);
+             return AnyP::Host::ParseIp(ip);
+         }
+ 
+-        debugs(83, 3, "unexpected length of an IP address SAN: " << san.d.iPAddress->length);
++        debugs(83, 3, "unexpected length of an IP address SAN: " <<
++               ASN1_STRING_length(san.d.iPAddress));
+         return std::nullopt;
+     }
+ 
+@@ -1484,7 +1485,8 @@
+     if (certProperties.mimicCert) {
+         if (auto *sig = Ssl::X509_get_signature(certProperties.mimicCert)) {
+             origSignatureAsKey = true;
+-            key.append((const char *)sig->data, sig->length);
++            key.append((const char *)ASN1_STRING_get0_data(sig),
++                       ASN1_STRING_length(sig));
+         }
+     }
+ 
