@@ -108,6 +108,8 @@ lookup program (dnsserver), a program for retrieving FTP data
 sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
 %build
+# OpenSSL 3 made ASN1_STRING opaque; Squid 7.6 still pokes internals
+export CPPFLAGS="-DOPENSSL_SUPPRESS_DEPRECATED ${CPPFLAGS}"
 
 # NIS helper has been removed because of the following bug
 # https://bugzilla.redhat.com/show_bug.cgi?id=1531540
