@@ -198,6 +198,7 @@ sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented
    --with-default-user="squid" \
    --with-dl \
    --with-openssl \
+   --without-included-ltdl \
    --with-pthreads \
    --disable-arch-native \
    --disable-security-cert-validators \
