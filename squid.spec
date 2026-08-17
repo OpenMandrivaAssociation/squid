@@ -104,6 +104,11 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch -P 202 -p1 -b .location
 %patch -P 203 -p1 -b .perlpath
 %patch -P 204 -p1 -b .openssl4-asn1
+# OpenSSL 4: X509_get_*_name() returns const
+sed -i \
+	-e 's/ParseCommonNameAt(X509_NAME \&, int)/ParseCommonNameAt(const X509_NAME \&, int)/' \
+	-e 's/ParseCommonNameAt(X509_NAME \&name/ParseCommonNameAt(const X509_NAME \&name/' \
+	src/ssl/gadgets.h src/ssl/gadgets.cc
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
