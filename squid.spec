@@ -18,7 +18,6 @@ Source6:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.nm
 Source7:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.service
 Source8:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/cache_swap.sh
 Source9:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysusers
-Source10: squid-7.6-openssl4-const.h
 
 Source98: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/perl-requires-squid.sh
 
@@ -110,15 +109,53 @@ sed -i \
 	-e 's/ParseCommonNameAt(X509_NAME \&, int)/ParseCommonNameAt(const X509_NAME \&, int)/' \
 	-e 's/ParseCommonNameAt(X509_NAME \&name/ParseCommonNameAt(const X509_NAME \&name/' \
 	src/ssl/gadgets.h src/ssl/gadgets.cc
+python3 - << 'PY'
+from pathlib import Path
+repls = {
+	'src/ssl/gadgets.cc': [
+		('X509_NAME *name = X509_get_subject_name(cert.get());',
+		 'X509_NAME *name = const_cast<X509_NAME *>(X509_get_subject_name(cert.get()));'),
+		('X509_NAME_ENTRY *tmp = X509_NAME_get_entry(name, loc);',
+		 'X509_NAME_ENTRY *tmp = const_cast<X509_NAME_ENTRY *>(X509_NAME_get_entry(name, loc));'),
+		('(ext = X509_get_ext(issuerCert.get(), indx))',
+		 '(ext = const_cast<X509_EXTENSION *>(X509_get_ext(issuerCert.get(), indx)))'),
+		('if (X509_EXTENSION *ext = X509_get_ext(mimicCert.get(), pos))',
+		 'if (X509_EXTENSION *ext = const_cast<X509_EXTENSION *>(X509_get_ext(mimicCert.get(), pos)))'),
+		('(ext = X509_get_ext(cert.get(), p))',
+		 '(ext = const_cast<X509_EXTENSION *>(X509_get_ext(cert.get(), p)))'),
+		('if (X509_NAME *name = X509_get_subject_name(properties.mimicCert.get()))',
+		 'if (X509_NAME *name = const_cast<X509_NAME *>(X509_get_subject_name(properties.mimicCert.get())))'),
+		('alStr = X509_alias_get0(properties.mimicCert.get(), &alLen);',
+		 'alStr = const_cast<unsigned char *>(X509_alias_get0(properties.mimicCert.get(), &alLen));'),
+		('X509_EXTENSION *ext=X509_get_ext(properties.mimicCert.get(), pos);',
+		 'X509_EXTENSION *ext=const_cast<X509_EXTENSION *>(X509_get_ext(properties.mimicCert.get(), pos));'),
+		('X509_NAME *cert1_name = X509_get_subject_name(cert);',
+		 'X509_NAME *cert1_name = const_cast<X509_NAME *>(X509_get_subject_name(cert));'),
+		('X509_NAME *cert2_name = X509_get_subject_name(cert2);',
+		 'X509_NAME *cert2_name = const_cast<X509_NAME *>(X509_get_subject_name(cert2));'),
+	],
+	'src/ssl/support.cc': [
+		('name = X509_get_subject_name(cert);',
+		 'name = const_cast<X509_NAME *>(X509_get_subject_name(cert));'),
+		('name = X509_get_issuer_name(cert);',
+		 'name = const_cast<X509_NAME *>(X509_get_issuer_name(cert));'),
+	],
+}
+for rel, pairs in repls.items():
+	p = Path(rel)
+	t = p.read_text()
+	for old, new in pairs:
+		if old not in t:
+			raise SystemExit(f'{rel}: missing {old!r}')
+		t = t.replace(old, new)
+	p.write_text(t)
+PY
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
 sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
 %build
-# OpenSSL 4 getters return const; Squid 7.6 still stores them in mutable pointers
-export CXXFLAGS="${CXXFLAGS} -include %{_sourcedir}/squid-7.6-openssl4-const.h"
-
 # NIS helper has been removed because of the following bug
 # https://bugzilla.redhat.com/show_bug.cgi?id=1531540
 %configure \
