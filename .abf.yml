@@ -9,3 +9,5 @@ sources:
   squid.sysconfig: f9a4d376e92643a904feedceda6e64ae97f11b90
   squid.sysusers: 885277da60e1a87072adfb666b49851441a695dc
   squid-7.6.tar.xz: abf10758e1676c24d720f14cd11dd1c8b0502988
+  squid-7.6.tar.xz.asc: 10ba27e5f794a88d30b0630a01951bdced9a1b74
+  pgp.asc: 164c110be45adeb2a3f8b931636743f70ac41091
