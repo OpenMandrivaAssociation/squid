@@ -109,6 +109,8 @@ lookup program (dnsserver), a program for retrieving FTP data
 sed -i \
 	-e 's/ParseCommonNameAt(X509_NAME \&, int)/ParseCommonNameAt(const X509_NAME \&, int)/' \
 	-e 's/ParseCommonNameAt(X509_NAME \&name/ParseCommonNameAt(const X509_NAME \&name/' \
+	-e 's/OneLineSummary(X509_NAME \&)/OneLineSummary(const X509_NAME \&)/' \
+	-e 's/OneLineSummary(X509_NAME \&name)/OneLineSummary(const X509_NAME \&name)/' \
 	src/ssl/gadgets.h src/ssl/gadgets.cc
 python3 - << 'PY'
 from pathlib import Path
@@ -140,6 +142,10 @@ repls = {
 		 'name = const_cast<X509_NAME *>(X509_get_subject_name(cert));'),
 		('name = X509_get_issuer_name(cert);',
 		 'name = const_cast<X509_NAME *>(X509_get_issuer_name(cert));'),
+	],
+	'src/security/cert_generators/file/certificate_db.cc': [
+		('std::string(reinterpret_cast<char *>(tm->data), tm->length)',
+		 'std::string(reinterpret_cast<const char *>(ASN1_STRING_get0_data(tm)), ASN1_STRING_length(tm))'),
 	],
 }
 for rel, pairs in repls.items():
