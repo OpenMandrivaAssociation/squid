@@ -121,8 +121,8 @@ sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented
    --enable-eui \
    --enable-follow-x-forwarded-for \
    --enable-auth \
-   --enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB,SMB_LM" \
-   --enable-auth-ntlm="SMB_LM,fake" \
+   --enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB" \
+   --enable-auth-ntlm="fake" \
    --enable-auth-digest="file,LDAP" \
    --enable-auth-negotiate="kerberos" \
    --enable-external-acl-helpers="LDAP_group,time_quota,session,unix_group,wbinfo_group,kerberos_ldap_group" \
