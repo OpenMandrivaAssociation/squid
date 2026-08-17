@@ -18,6 +18,7 @@ Source6:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.nm
 Source7:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.service
 Source8:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/cache_swap.sh
 Source9:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysusers
+Source10: squid-7.6-openssl4-const.h
 
 Source98: https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/perl-requires-squid.sh
 
@@ -116,7 +117,7 @@ sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented
 
 %build
 # OpenSSL 4 getters return const; Squid 7.6 still stores them in mutable pointers
-export CXXFLAGS="${CXXFLAGS} -fpermissive"
+export CXXFLAGS="${CXXFLAGS} -include %{_sourcedir}/squid-7.6-openssl4-const.h"
 
 # NIS helper has been removed because of the following bug
 # https://bugzilla.redhat.com/show_bug.cgi?id=1531540
