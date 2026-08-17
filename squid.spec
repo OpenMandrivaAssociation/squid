@@ -305,7 +305,6 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 %config %{_sysconfdir}/squid/squid.conf.default
 %config %{_sysconfdir}/squid/mime.conf.default
 %config %{_sysconfdir}/squid/errorpage.css.default
-%config %{_sysconfdir}/squid/cachemgr.conf.default
 %config(noreplace) %{_sysconfdir}/pam.d/squid
 %config(noreplace) %{_sysconfdir}/logrotate.d/squid
 
@@ -314,10 +313,7 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 %{_prefix}/lib/NetworkManager
 %{_datadir}/squid/icons
 %{_sbindir}/squid
-%{_bindir}/squidclient
-%{_bindir}/purge
 %{_mandir}/man8/*
-%{_mandir}/man1/*
 %{_libdir}/squid/*
 %{_datadir}/snmp/mibs/SQUID-MIB.txt
 %{_tmpfilesdir}/squid.conf
