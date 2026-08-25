@@ -1,5 +1,5 @@
---- squid-7.6/QUICKSTART	2026-04-20 10:41:18.000000000 +0200
-+++ squid-7.6/QUICKSTART	2026-08-03 04:44:47.409436801 +0200
+--- squid-7.7/QUICKSTART	2026-04-20 10:41:18.000000000 +0200
++++ squid-7.7/QUICKSTART	2026-08-25 16:31:25.479067704 +0200
 @@ -10,10 +10,9 @@ After you retrieved, compiled and instal
  INSTALL in the same directory), you have to configure the squid.conf
  file. This is the list of the values you *need* to change, because no

@@ -1,16 +1,18 @@
 %define __perl_requires %{SOURCE98}
+%define version_underscore %(echo %{version} | tr '.' '_')
 
 Name:     squid
-Version:  7.6
-Release:  2
+Version:  7.7
+Release:  1
 Summary:  The Squid proxy caching server
+Group:    System/Servers
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
 URL:      https://www.squid-cache.org
 
-Source0:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz.asc
-Source2:  http://www.squid-cache.org/pgp.asc
+Source0:  https://github.com/squid-cache/squid/releases/download/SQUID_%{version_underscore}/squid-%{version}.tar.xz
+Source1:  https://github.com/squid-cache/squid/releases/download/SQUID_%{version_underscore}/squid-%{version}.tar.xz.asc
+Source2:  https://www.squid-cache.org/pgp.asc
 Source3:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.logrotate
 Source4:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.sysconfig
 Source5:  https://src.fedoraproject.org/rpms/squid/raw/rawhide/f/squid.pam
@@ -112,7 +114,7 @@ sed -i \
 	-e 's/OneLineSummary(X509_NAME \&)/OneLineSummary(const X509_NAME \&)/' \
 	-e 's/OneLineSummary(X509_NAME \&name)/OneLineSummary(const X509_NAME \&name)/' \
 	src/ssl/gadgets.h src/ssl/gadgets.cc
-python3 - << 'PY'
+python - << 'PY'
 from pathlib import Path
 repls = {
 	'src/ssl/gadgets.cc': [
@@ -362,15 +364,6 @@ do
     end
   end
 end
-
-%post
-%systemd_post squid.service
-
-%preun
-%systemd_preun squid.service
-
-%postun
-%systemd_postun_with_restart squid.service
 
 %triggerin -- samba-common
 if ! getent group wbpriv >/dev/null 2>&1 ; then

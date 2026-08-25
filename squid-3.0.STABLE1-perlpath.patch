@@ -1,5 +1,5 @@
---- squid-7.6/contrib/url-normalizer.pl	2026-04-20 10:41:18.000000000 +0200
-+++ squid-7.6/contrib/url-normalizer.pl	2026-08-03 04:44:47.427741445 +0200
+--- squid-7.7/contrib/url-normalizer.pl	2026-04-20 10:41:18.000000000 +0200
++++ squid-7.7/contrib/url-normalizer.pl	2026-08-25 16:31:25.483722051 +0200
 @@ -1,4 +1,4 @@
 -#!/usr/local/bin/perl -Tw
 +#!/usr/bin/perl -Tw
